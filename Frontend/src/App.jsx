@@ -12,16 +12,24 @@ import { RegulatoryRules } from './pages/admin/RegulatoryRules.jsx';
 import { AdminUsers } from './pages/admin/AdminUsers.jsx';
 import { CostAnalysis } from './pages/admin/CostAnalysis.jsx';
 import { ChatAssistant } from './pages/employee/ChatAssistant.jsx';
+import { WidgetChat } from './pages/WidgetChat.jsx';
+import { TestExternalWebsite } from './pages/TestExternalWebsite.jsx';
 
 export default function App() {
   return (
     <BrowserRouter>
-      {/* Global Navbar rendered for everyone with responsive links */}
+      {/* Global Navbar rendered for everyone with responsive links (auto-hidden on /widget and /test) */}
       <Navbar />
 
       <Routes>
         {/* Public Landing Home Page */}
         <Route path="/" element={<Home />} />
+
+        {/* Embeddable Standalone AI Compliance Widget */}
+        <Route path="/widget" element={<WidgetChat />} />
+
+        {/* External Website Test Page with Integrated AI Compliance Widget */}
+        <Route path="/test" element={<TestExternalWebsite />} />
 
         {/* Public Login & Registration */}
         <Route path="/login" element={<Login />} />

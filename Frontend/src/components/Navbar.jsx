@@ -18,7 +18,7 @@ import {
   useColorMode,
   useColorModeValue,
 } from '@chakra-ui/react';
-import { NavLink as RouterLink, useNavigate } from 'react-router-dom';
+import { NavLink as RouterLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { NotificationBell } from './NotificationBell.jsx';
 import { UkFinanceLogo } from './UkFinanceLogo.jsx';
@@ -39,8 +39,13 @@ import {
 export const Navbar = () => {
   const { user, isAdmin, isEmployee, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const { colorMode, toggleColorMode } = useColorMode();
   const isDark = colorMode === 'dark';
+
+  if (location.pathname.startsWith('/widget') || location.pathname.startsWith('/test')) {
+    return null;
+  }
 
   const navBg = useColorModeValue('rgba(255, 255, 255, 0.98)', 'rgba(15, 23, 21, 0.96)');
   const navBorder = useColorModeValue('#E5ECE8', '#263B36');

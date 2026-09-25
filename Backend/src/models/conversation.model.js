@@ -72,8 +72,19 @@ const conversationSchema = new mongoose.Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
+      required: false,
+      default: null,
       index: true
+    },
+    widgetSessionId: {
+      type: String,
+      default: null,
+      index: true
+    },
+    source: {
+      type: String,
+      enum: ['WEB_APP', 'WIDGET'],
+      default: 'WEB_APP'
     },
     title: {
       type: String,
@@ -96,5 +107,6 @@ const conversationSchema = new mongoose.Schema(
 );
 
 conversationSchema.index({ userId: 1, updatedAt: -1 });
+conversationSchema.index({ widgetSessionId: 1, updatedAt: -1 });
 
 export const Conversation = mongoose.model('Conversation', conversationSchema);

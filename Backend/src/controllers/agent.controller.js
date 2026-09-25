@@ -16,9 +16,9 @@ const generateTitleFromQuestion = (question) => {
   return clean.slice(0, 39) + '...';
 };
 
-// Employee submits a question about UK Financial Rules to the AI Agent 
+// Employee or Embedded Widget submits a question about UK Financial Rules to the AI Agent 
 export const askAgent = asyncHandler(async (req, res) => {
-  const { question, conversationId, conversationHistory } = req.body;
+  const { question, conversationId, conversationHistory, widgetSessionId } = req.body;
 
   if (!question || typeof question !== 'string' || question.trim().length < 2) {
     throw ApiError.badRequest('Please provide a valid question regarding UK financial rules');
@@ -26,20 +26,27 @@ export const askAgent = asyncHandler(async (req, res) => {
 
   const trimmedQuestion = question.trim();
   const userId = req.user?._id || req.user?.id || null;
+  const cleanWidgetSessionId = typeof widgetSessionId === 'string' && widgetSessionId.trim().length >= 6
+    ? widgetSessionId.trim()
+    : null;
 
-  // 1. If authenticated and DB is ready, load or create the Conversation thread
+  // 1. If authenticated OR widgetSessionId is provided and DB is ready, load or create the Conversation thread
   let conversation = null;
   let historyForMemory = [];
 
-  if (userId && mongoose.connection.readyState === 1) {
+  if ((userId || cleanWidgetSessionId) && mongoose.connection.readyState === 1) {
     try {
-      if (conversationId && mongoose.Types.ObjectId.isValid(conversationId)) {
+      if (cleanWidgetSessionId) {
+        conversation = await Conversation.findOne({ widgetSessionId: cleanWidgetSessionId, isArchived: false });
+      } else if (conversationId && mongoose.Types.ObjectId.isValid(conversationId)) {
         conversation = await Conversation.findOne({ _id: conversationId, userId });
       }
 
       if (!conversation) {
         conversation = await Conversation.create({
-          userId,
+          userId: userId || null,
+          widgetSessionId: cleanWidgetSessionId || null,
+          source: cleanWidgetSessionId ? 'WIDGET' : 'WEB_APP',
           title: generateTitleFromQuestion(trimmedQuestion),
           messages: []
         });
@@ -62,9 +69,10 @@ export const askAgent = asyncHandler(async (req, res) => {
     historyForMemory = conversationHistory;
   }
 
-  // 2. Process query with RAG + Memory
+  // 2. Process query with RAG + Memory (pass isWidget flag for concise widget formatting)
   const result = await processEmployeeQuery(trimmedQuestion, req.user || {}, {
-    conversationHistory: historyForMemory
+    conversationHistory: historyForMemory,
+    isWidget: Boolean(cleanWidgetSessionId)
   });
 
   // 3. Persist messages into the active Conversation thread
@@ -109,10 +117,48 @@ export const askAgent = asyncHandler(async (req, res) => {
     {
       ...result,
       conversationId: conversation?._id || null,
-      conversationTitle: conversation?.title || null
+      conversationTitle: conversation?.title || null,
+      widgetSessionId: cleanWidgetSessionId || null
     },
     'AI response generated successfully'
   );
+});
+
+// Restore or initialize a widget session by widgetSessionId (Public/Embeddable)
+export const getWidgetSession = asyncHandler(async (req, res) => {
+  const { widgetSessionId } = req.params;
+  if (!widgetSessionId || widgetSessionId.trim().length < 6 || mongoose.connection.readyState !== 1) {
+    return ApiResponse.success(res, { widgetSessionId, messages: [] }, 'Widget session initialized');
+  }
+
+  const conversation = await Conversation.findOne({
+    widgetSessionId: widgetSessionId.trim(),
+    isArchived: false
+  }).select('title widgetSessionId messages updatedAt');
+
+  if (!conversation) {
+    return ApiResponse.success(res, { widgetSessionId: widgetSessionId.trim(), messages: [] }, 'New widget session ready');
+  }
+
+  return ApiResponse.success(
+    res,
+    {
+      conversationId: conversation._id,
+      widgetSessionId: conversation.widgetSessionId,
+      title: conversation.title,
+      messages: conversation.messages || []
+    },
+    'Widget session restored successfully'
+  );
+});
+
+// Clear/reset a widget session by widgetSessionId (Public/Embeddable)
+export const clearWidgetSession = asyncHandler(async (req, res) => {
+  const { widgetSessionId } = req.params;
+  if (widgetSessionId && mongoose.connection.readyState === 1) {
+    await Conversation.deleteMany({ widgetSessionId: widgetSessionId.trim() });
+  }
+  return ApiResponse.success(res, { widgetSessionId, cleared: true }, 'Widget session cleared');
 });
 
 // List all past conversation threads for the logged-in user

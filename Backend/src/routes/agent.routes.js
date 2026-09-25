@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import {
   askAgent,
+  getWidgetSession,
+  clearWidgetSession,
   listConversations,
   createConversation,
   getConversation,
@@ -14,8 +16,12 @@ import { authenticate, optionalAuthenticate, authorizeRoles } from '../middlewar
 
 const router = Router();
 
-// Ask questions about UK financial rules (Open to guests with optional auth, full session memory when logged in)
+// Ask questions about UK financial rules (Open to guests/widgets with optional auth, full session memory)
 router.post('/query', optionalAuthenticate, askAgent);
+
+// Embeddable Widget Session Restore & Reset
+router.get('/widget/session/:widgetSessionId', getWidgetSession);
+router.delete('/widget/session/:widgetSessionId', clearWidgetSession);
 
 // Conversation management (authenticated users)
 router.get('/conversations', authenticate, listConversations);

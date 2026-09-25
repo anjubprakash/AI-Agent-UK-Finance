@@ -40,7 +40,9 @@ import {
   Users,
   UserPlus,
   Coins,
+  Code2,
 } from 'lucide-react';
+import { ComplianceWidget } from '../../components/widget/ComplianceWidget.jsx';
 
 export const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -178,6 +180,20 @@ export const AdminDashboard = () => {
                 borderRadius="xl"
               >
                 Chat & Test Copilot
+              </Button>
+
+              <Button
+                bg={heroBtnBg}
+                color={heroBtnText}
+                _hover={{ bg: heroBtnHover }}
+                size="md"
+                leftIcon={<Code2 size={17} />}
+                onClick={() => navigate('/widget')}
+                fontWeight="700"
+                fontSize="sm"
+                borderRadius="xl"
+              >
+                AI Widget & Embed Code
               </Button>
 
               <Button
@@ -477,6 +493,9 @@ export const AdminDashboard = () => {
           </CardBody>
         </Card>
       </VStack>
+
+      {/* Live Floating AI Compliance Widget for Admin Testing */}
+      <ComplianceWidget mode="floating" defaultOpen={false} />
     </Container>
   );
 };

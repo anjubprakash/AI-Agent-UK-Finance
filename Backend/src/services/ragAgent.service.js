@@ -88,18 +88,84 @@ export const calculateTokenCost = (model, promptTokens = 0, completionTokens = 0
   };
 };
 
+// Helper: Convert wide Markdown tables into compact bullet points for Widget responses when user did not ask for a table
+const formatConciseWidgetAnswer = (markdownText = '', askedForTable = false) => {
+  if (!markdownText || askedForTable) return markdownText;
+
+  let text = markdownText
+    // Strip trailing verbatim boilerplate lines
+    .replace(/\n*_?All excerpts are taken verbatim[^\n]*_?\s*$/gi, '')
+    .trim();
+
+  // Convert Markdown tables into concise bullet lines so widget chat stays compact & readable
+  const lines = text.split('\n');
+  const out = [];
+  let tableHeaders = [];
+  let inTable = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    const isTableRow = line.startsWith('|') && line.endsWith('|') && line.split('|').length > 2;
+    const isSeparatorRow = isTableRow && /^[\s|:\-]+$/.test(line);
+
+    if (isTableRow) {
+      const cells = line
+        .slice(1, -1)
+        .split('|')
+        .map((c) => c.trim().replace(/<br\s*\/?>/gi, '; '));
+
+      if (!inTable) {
+        inTable = true;
+        tableHeaders = cells;
+      } else if (!isSeparatorRow) {
+        const primary = cells[0] || '';
+        const details = cells
+          .slice(1)
+          .filter(Boolean)
+          .join(' — ');
+        if (primary || details) {
+          out.push(`- ${primary.startsWith('**') ? primary : `**${primary}**`}: ${details}`);
+        }
+      }
+    } else {
+      if (inTable) {
+        inTable = false;
+        tableHeaders = [];
+      }
+      out.push(lines[i]);
+    }
+  }
+
+  let cleaned = out.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+  // Keep widget responses relatively compact (trim excessive trailing summary sections if table bullets already cover it)
+  if (cleaned.length > 1100) {
+    const paragraphs = cleaned.split('\n\n');
+    let acc = '';
+    for (const p of paragraphs) {
+      if ((acc + '\n\n' + p).length > 1050 && acc.length > 350) break;
+      acc = acc ? `${acc}\n\n${p}` : p;
+    }
+    cleaned = acc.trim();
+  }
+  return cleaned;
+};
+
 // Employee Regulatory AI Agent powered by Qdrant semantic search & Groq LLM with multi-turn memory
 export const processEmployeeQuery = async (question, user = {}, options = {}) => {
   const conversationHistory = options.conversationHistory || [];
+  const isWidget = Boolean(options.isWidget);
+  const askedForTable = /\b(table|tabular|columns|grid|matrix)\b/i.test(question || '');
   const trimmed = (question || '').trim().toLowerCase();
 
-  // Gracefully handle common greetings and orientation questions
-  const isGreeting = /^(hi|hello|hey|good\s+(morning|afternoon|evening)|help|greetings|who\s+are\s+you|what\s+can\s+you\s+do)[\s!.,?]*$/i.test(trimmed);
+  // Gracefully handle common greetings and orientation questions (including "hii", "helloo")
+  const isGreeting = /^(hi+|hello+|hey+|good\s+(morning|afternoon|evening)|help|greetings|who\s+are\s+you|what\s+can\s+you\s+do)[\s!.,?]*$/i.test(trimmed);
   if (isGreeting) {
     return {
       queryId: `greeting_${Date.now()}`,
       question,
-      answer: `### 👋 Welcome to the UK Financial Rules AI Compliance Assistant\n\nI am your dedicated compliance intelligence assistant for official UK financial regulations published by the **Financial Conduct Authority (FCA)**, **Prudential Regulation Authority (PRA)**, and the **Bank of England**.\n\nEvery response is strictly grounded in the official regulatory sourcebooks stored in the knowledge base, complete with statutory citations.\n\n**You can ask compliance inquiries such as:**\n- *'What are the 12 Principles for Businesses under FCA PRIN?'*\n- *'What are the core obligations under the Consumer Duty (PRIN 2A)?'*\n- *'What factors determine competence and capability under FIT 1.1.2G?'*\n- *'What senior management governance systems are required under SYSC 4.1?'*`,
+      answer: isWidget
+        ? `👋 **Hello!** I am your **UK Financial Rules AI Assistant**.\n\nAsk me any FCA or PRA compliance question (e.g., **DISP** complaint limits, **PROD 4** fair value, **FIT 1.1.2**, or **SUP 15** notifications) for a concise, rule-cited answer.`
+        : `### 👋 Welcome to the UK Financial Rules AI Compliance Assistant\n\nI am your dedicated compliance intelligence assistant for official UK financial regulations published by the **Financial Conduct Authority (FCA)**, **Prudential Regulation Authority (PRA)**, and the **Bank of England**.\n\nEvery response is strictly grounded in the official regulatory sourcebooks stored in the knowledge base, complete with statutory citations.\n\n**You can ask compliance inquiries such as:**\n- *'What are the 12 Principles for Businesses under FCA PRIN?'*\n- *'What are the core obligations under the Consumer Duty (PRIN 2A)?'*\n- *'What factors determine competence and capability under FIT 1.1.2G?'*\n- *'What senior management governance systems are required under SYSC 4.1?'*`,
       citedRules: [],
       confidence: 'HIGH',
       suggestedFollowUps: [],
@@ -120,7 +186,9 @@ export const processEmployeeQuery = async (question, user = {}, options = {}) =>
 
   if (cachedHit) {
     // ⚡ CACHE HIT (EXACT OR SEMANTIC): 100% token savings across users & sessions!
-    const answer = cachedHit.answer;
+    const answer = isWidget
+      ? formatConciseWidgetAnswer(cachedHit.answer, askedForTable)
+      : cachedHit.answer;
     const confidence = cachedHit.confidence || 'HIGH';
     const suggestedFollowUps = cachedHit.suggestedFollowUps || [];
     const citedRules = cachedHit.citedRules || [];
@@ -253,6 +321,12 @@ ${snippet}
 `;
   }).join('\n---\n\n');
 
+  const formattingRule = isWidget
+    ? askedForTable
+      ? '6. WIDGET TABLE MODE: Because the user explicitly requested a table, present the key distinctions in a compact Markdown table and keep surrounding text brief (~120 words).'
+      : '6. WIDGET CONCISE MODE (STRICT): Keep your answer concise, precise, and relatively small (3 to 5 short bullet points, ~90–150 words total). Cite exact FCA/PRA rule codes inline in bold (e.g., **DISP 1.6.2 R**, **FIT 1.1.2 G**). DO NOT output any Markdown tables (| ... |) because the user did not ask for a table. Do NOT append closing disclaimers such as "All excerpts are taken verbatim...".'
+    : '6. When comparing rules or displaying multiple requirements, present the key distinctions in a clean Markdown table.';
+
   // Streamlined Static Compliance Prompt Prefix (optimized for hardware KV cache reuse)
   const STATIC_COMPLIANCE_INSTRUCTIONS = `You are the UK Financial Rules AI Compliance Assistant.
 Your mission is to provide accurate, authoritative answers about UK financial regulations (FCA, PRA, Bank of England).
@@ -263,7 +337,7 @@ STRICT COMPLIANCE RULES:
 3. When a question combines two or more regulatory concepts or sourcebooks (e.g. PROD + DISP, FCG + SUP, CASS + SYSC), synthesize a unified compliance analysis integrating the provisions provided across the sources and cite each sourcebook's exact rule codes.
 4. Quote the exact authority (FCA, PRA), rule codes (e.g. PROD 4, DISP 1.1A, CASS 5.5, SUP 15.3), and document titles.
 5. Follow-Up Questions Rule: Only suggest 2 follow-up compliance questions IF they directly ask about specific clauses, sub-paragraphs, or rule codes explicitly present in the provided RELEVANT UK FINANCIAL RULES above. Never suggest questions about unprovided chapters, external guidelines, or speculative topics. If confidence is "NOT_FOUND", output "suggestedFollowUps": [].
-6. When comparing rules or displaying multiple requirements, present the key distinctions in a clean Markdown table.
+${formattingRule}
 7. Multi-Turn Conversational Memory: When the user's question contains pronouns or relative references (such as "they", "them", "their", "it", "its", "he", "she", "this rule", "that requirement", "what about exceptions/penalties"), resolve them directly against the prior conversation turns in the thread.
 
 Respond strictly in JSON:
@@ -343,7 +417,8 @@ Respond strictly in JSON:
     raw = raw.replace(/```json\s*|```\s*$/g, '').trim();
     const parsed = JSON.parse(raw);
 
-    answer = parsed.answer || 'Answer generated strictly based on provided UK financial rules.';
+    const rawAnswer = parsed.answer || 'Answer generated strictly based on provided UK financial rules.';
+    answer = isWidget ? formatConciseWidgetAnswer(rawAnswer, askedForTable) : rawAnswer;
     confidence = parsed.confidence || 'HIGH';
 
     // Clean and validate real follow-ups

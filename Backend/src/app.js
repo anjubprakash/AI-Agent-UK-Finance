@@ -15,12 +15,21 @@ import notificationRoutes from './routes/notification.routes.js';
 
 const app = express();
 
-// Security Middlewares
-app.use(helmet());
-app.use(cors({
-  origin: env.CORS_ORIGIN === '*' ? '*' : env.CORS_ORIGIN.split(','),
-  credentials: true
-}));
+// Security Middlewares (Configured to allow cross-origin iframe & script widget embedding)
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    frameguard: false
+  })
+);
+app.use(
+  cors({
+    origin: true,
+    credentials: true
+  })
+);
 
 // Request Rate Limiting
 app.use('/api', apiRateLimiter);
