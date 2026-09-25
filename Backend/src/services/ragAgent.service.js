@@ -5,39 +5,54 @@ import { promptCache } from './promptCache.service.js';
 import { QueryHistory } from '../models/queryHistory.model.js';
 import { env } from '../config/env.js';
 
-// Helper to contextualize follow-up questions for Qdrant vector retrieval
-const buildContextualSearchQuery = (question, conversationHistory = []) => {
-  if (!conversationHistory || conversationHistory.length === 0) {
-    return question;
-  }
-
+// Helper to contextualize follow-up questions (pronouns like they/them/their/it/he/she/this/that) for Qdrant vector retrieval
+const isConversationalFollowUp = (question = '', conversationHistory = []) => {
+  if (!conversationHistory || conversationHistory.length === 0) return false;
   const trimmed = question.trim();
+  const hasPronouns = /\b(this|that|these|those|it|its|they|them|their|theirs|he|him|his|she|her|the\s+principle|the\s+rule|the\s+section|the\s+sourcebook|the\s+firm|the\s+requirement|above|previous|earlier|former|latter|how\s+about|what\s+about|and\s+what)\b/i.test(trimmed);
+  const ALL_SOURCEBOOKS_REGEX = /\b(?:CONC|FIT|PRIN|SYSC|COBS|MCOB|SUP|CASS|GEN|DISP|COCON|BCOBS|ICOBS|MAR|PROD|FCG)\b/i;
+  if (ALL_SOURCEBOOKS_REGEX.test(trimmed) && !hasPronouns) return false;
+  return (
+    hasPronouns ||
+    /\b(exceptions|penalties|obligations|reconciliation|shortfall|breach|notification|reporting|timeframes|deadlines|furthermore|also|more\s+detail|explain\s+more)\b/i.test(trimmed) ||
+    trimmed.length < 65
+  );
+};
 
-  // If the query already explicitly identifies an official rule or sourcebook, it is self-contained
-  const hasExplicitRule = /\b(?:CONC|FIT|PRIN|SYSC|COBS|MCOB|SUP|CASS|GEN|DISP|COCON|BCOBS|ICOBS|MAR|PROD)\s*(?:[0-9]+|[A-Z])/i.test(trimmed);
-  if (hasExplicitRule) {
+const buildContextualSearchQuery = (question, conversationHistory = []) => {
+  if (!isConversationalFollowUp(question, conversationHistory)) {
     return question;
   }
 
-  // Check if query is a follow-up inquiry with pronouns or relative references
-  const isFollowUp = /\b(this|that|these|those|it|the principle|the rule|the section|exceptions|penalties|obligations|furthermore|how about|what about)\b/i.test(trimmed);
+  // Extract rule codes and key topic terms from recent user AND assistant turns
+  const recentTurns = conversationHistory.slice(-4);
+  const detectedRuleCodes = new Set();
+  const ruleExtractRegex = /\b(?:CONC|FIT|PRIN|SYSC|COBS|MCOB|SUP|CASS|GEN|DISP|COCON|BCOBS|ICOBS|MAR|PROD|FCG)(?:\s*[0-9]+[A-Z0-9]*(?:\.[0-9]+[A-Z0-9]*)*(?:\s*[A-Z])?)?/gi;
 
-  if (!isFollowUp && trimmed.length > 25) {
-    return question;
+  for (const turn of recentTurns) {
+    if (Array.isArray(turn.citedRules)) {
+      for (const cr of turn.citedRules) {
+        if (cr.ruleCode) detectedRuleCodes.add(cr.ruleCode.trim());
+        if (cr.ruleTitle) detectedRuleCodes.add(cr.ruleTitle.trim());
+      }
+    }
+    if (turn.content) {
+      const matches = turn.content.match(ruleExtractRegex) || [];
+      for (const m of matches.slice(0, 6)) {
+        detectedRuleCodes.add(m.trim().replace(/\s+/g, ' '));
+      }
+    }
   }
 
-  // Find the last user question or assistant topic
+  const rulePrefix = Array.from(detectedRuleCodes).slice(0, 5).join(' ');
+  if (rulePrefix) {
+    return `${rulePrefix} ${question}`.replace(/\s+/g, ' ').trim();
+  }
+
   const lastUserTurn = [...conversationHistory].reverse().find((m) => m.role === 'user');
-  if (lastUserTurn && lastUserTurn.content) {
-    // Extract rule identifiers (e.g. PRIN 2.1, SYSC 4, FIT 1.1, CASS 7, COCON 2)
-    const ruleMatch = lastUserTurn.content.match(/\b(PRIN|SYSC|FIT|CASS|COCON|COBS|DISP|CONC|MCOB)\s*(?:[0-9]+[A-Z0-9]*(?:\.[0-9]+[A-Z0-9]*)*)?/i);
-    if (ruleMatch && !trimmed.toUpperCase().includes(ruleMatch[1].toUpperCase())) {
-      return `${ruleMatch[0]} ${question}`;
-    }
-    // Prepend key topic snippet if query is short
-    if (trimmed.length < 35) {
-      return `${lastUserTurn.content.slice(0, 40)} ${question}`;
-    }
+  const priorUserTopic = lastUserTurn?.content ? lastUserTurn.content.slice(0, 60).trim() : '';
+  if (priorUserTopic) {
+    return `${priorUserTopic} ${question}`.replace(/\s+/g, ' ').trim();
   }
 
   return question;
@@ -92,11 +107,16 @@ export const processEmployeeQuery = async (question, user = {}, options = {}) =>
     };
   }
 
-  // 1. Immediate Multi-Tier Prompt Caching Check (RAM L1 + MongoDB L2 + QueryHistory L3)
-  // Check if this inquiry was already answered across any user or session before doing vector search
+  // 1. Contextualize follow-up search query (resolves pronouns like they/them/their/it/this/that using conversation history)
+  const isFollowUpTurn = isConversationalFollowUp(question, conversationHistory);
+  const contextualSearchQuery = buildContextualSearchQuery(question, conversationHistory);
+
+  // 2. Multi-Tier Prompt & Semantic Caching Check (RAM L1 + MongoDB L2 + Qdrant Semantic L3)
+  // If this is a pronoun follow-up turn (e.g. "What must they send to them if it is not resolved?"),
+  // only use cache if the exact contextualized follow-up was already answered, never falsely matching Turn 1's broad question!
   const model = env.GROQ_MODEL;
-  const cacheKey = promptCache.generateKey(model, question);            
-  const cachedHit = await promptCache.get(cacheKey, question, model);
+  const cacheKey = promptCache.generateKey(model, contextualSearchQuery);
+  const cachedHit = isFollowUpTurn ? null : await promptCache.get(cacheKey, contextualSearchQuery, model);
 
   if (cachedHit) {
     // ⚡ CACHE HIT (EXACT OR SEMANTIC): 100% token savings across users & sessions!
@@ -172,9 +192,6 @@ export const processEmployeeQuery = async (question, user = {}, options = {}) =>
     };
   }
 
-  // 2. Contextualize search query for vector retrieval
-  const contextualSearchQuery = buildContextualSearchQuery(question, conversationHistory);
-
   // 3. Retrieve top matching official UK financial rules from Qdrant with hybrid scoring
   let retrievedPoints = [];
   try {
@@ -214,7 +231,7 @@ export const processEmployeeQuery = async (question, user = {}, options = {}) =>
   }
 
   const citedRules = [];
-  const topPoints = (retrievedPoints || []).slice(0, 3);
+  const topPoints = (retrievedPoints || []).slice(0, 5);
   const contextText = topPoints.map((p, idx) => {
     const payload = p.payload || {};
     citedRules.push({
@@ -242,11 +259,12 @@ Your mission is to provide accurate, authoritative answers about UK financial re
 
 STRICT COMPLIANCE RULES:
 1. Base your answer EXCLUSIVELY on the provided UK financial rules from the knowledge base.
-2. If the sources do not contain sufficient information, state: "The uploaded regulatory documents in the knowledge base do not contain information or provisions to answer this question. Please upload the relevant official FCA/PRA sourcebook."
-3. If a source states there are no requirements, quote the exact rule code (e.g. FIT Sch 1.1 G).
-4. Quote the exact authority (FCA, PRA), rule codes (e.g. FIT 2.1.3 G, CONC 1.2.1 R), and document titles.
-5. Follow-Up Questions Rule: Only suggest 2 follow-up compliance questions IF they directly ask about specific clauses, sub-paragraphs, or rule codes explicitly present in the provided RELEVANT UK FINANCIAL RULES above. Never suggest questions about unprovided chapters, external guidelines, or speculative topics. If no further relevant provisions are in the provided text, output "suggestedFollowUps": [].
+2. If the question is completely unrelated to UK financial regulations (e.g. cooking recipes, sports, foreign non-UK law) or none of the provided sources relate to the inquiry, state: "The uploaded regulatory documents in the knowledge base do not contain information or provisions to answer this question. Please upload the relevant official FCA/PRA sourcebook." and set confidence to "NOT_FOUND".
+3. When a question combines two or more regulatory concepts or sourcebooks (e.g. PROD + DISP, FCG + SUP, CASS + SYSC), synthesize a unified compliance analysis integrating the provisions provided across the sources and cite each sourcebook's exact rule codes.
+4. Quote the exact authority (FCA, PRA), rule codes (e.g. PROD 4, DISP 1.1A, CASS 5.5, SUP 15.3), and document titles.
+5. Follow-Up Questions Rule: Only suggest 2 follow-up compliance questions IF they directly ask about specific clauses, sub-paragraphs, or rule codes explicitly present in the provided RELEVANT UK FINANCIAL RULES above. Never suggest questions about unprovided chapters, external guidelines, or speculative topics. If confidence is "NOT_FOUND", output "suggestedFollowUps": [].
 6. When comparing rules or displaying multiple requirements, present the key distinctions in a clean Markdown table.
+7. Multi-Turn Conversational Memory: When the user's question contains pronouns or relative references (such as "they", "them", "their", "it", "its", "he", "she", "this rule", "that requirement", "what about exceptions/penalties"), resolve them directly against the prior conversation turns in the thread.
 
 Respond strictly in JSON:
 {
@@ -258,14 +276,20 @@ Respond strictly in JSON:
   ]
 }`;
 
-  // Format historical messages compactly (last 4 turns, truncated assistant output to avoid token bloat)
-  const recentHistory = conversationHistory.slice(-4);
+  // Format historical messages (last 6 messages = 3 full back-and-forth turns, including cited rules for full pronoun context)
+  const recentHistory = conversationHistory.slice(-6);
   const historyMessages = [];
   for (const m of recentHistory) {
     if (m.role === 'user' && m.content) {
       historyMessages.push({ role: 'user', content: m.content });
     } else if (m.role === 'assistant' && m.content) {
-      historyMessages.push({ role: 'assistant', content: (m.content || '').slice(0, 150) + '...' });
+      const citedTag = Array.isArray(m.citedRules) && m.citedRules.length > 0
+        ? `[Cited Rules: ${m.citedRules.map((c) => c.ruleCode || c.ruleTitle).join(', ')}]\n`
+        : '';
+      historyMessages.push({
+        role: 'assistant',
+        content: `${citedTag}${(m.content || '').slice(0, 650)}`
+      });
     }
   }
 
@@ -342,7 +366,7 @@ Respond strictly in JSON:
         { answer, confidence, suggestedFollowUps, citedRules },
         { promptTokens, completionTokens, totalTokens, cachedTokens: rawPromptTokens + completionTokens },
         null,
-        question,
+        contextualSearchQuery,
         model
       );
     } else {

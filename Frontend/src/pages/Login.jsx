@@ -20,13 +20,14 @@ import {
   TabPanel,
   Divider,
   Badge,
+  IconButton,
   useColorModeValue,
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { authApi } from '../api/auth.api.js';
 import { UkFinanceLogo } from '../components/UkFinanceLogo.jsx';
-import { Lock, Mail, User, Briefcase, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Lock, Mail, User, Briefcase, ShieldCheck, ArrowRight, Eye, EyeOff } from 'lucide-react';
 
 export const Login = () => {
   const [tabIndex, setTabIndex] = useState(0);
@@ -48,12 +49,14 @@ export const Login = () => {
   // Sign In States
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   // Sign Up States
   const [signupName, setSignupName] = useState('');
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
+  const [showSignupPassword, setShowSignupPassword] = useState(false);
   const [signupDepartment, setSignupDepartment] = useState('');
   const [isSigningUp, setIsSigningUp] = useState(false);
 
@@ -263,7 +266,7 @@ export const Login = () => {
                         >
                           <Lock size={16} color="#52796F" />
                           <Input
-                            type="password"
+                            type={showLoginPassword ? 'text' : 'password'}
                             placeholder="••••••••"
                             value={loginPassword}
                             onChange={(e) => setLoginPassword(e.target.value)}
@@ -273,6 +276,16 @@ export const Login = () => {
                             fontSize="sm"
                             fontWeight="500"
                             color={inputTextColor}
+                          />
+                          <IconButton
+                            variant="ghost"
+                            size="xs"
+                            aria-label={showLoginPassword ? 'Hide password' : 'Show password'}
+                            icon={showLoginPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                            color="#52796F"
+                            _hover={{ bg: 'transparent', opacity: 0.75 }}
+                            onClick={() => setShowLoginPassword((prev) => !prev)}
+                            tabIndex={-1}
                           />
                         </HStack>
                       </FormControl>
@@ -370,8 +383,8 @@ export const Login = () => {
                         >
                           <Lock size={16} color="#52796F" />
                           <Input
-                            type="password"
-                            placeholder="At least 8 characters"
+                            type={showSignupPassword ? 'text' : 'password'}
+                            placeholder="Enter password"
                             value={signupPassword}
                             onChange={(e) => setSignupPassword(e.target.value)}
                             autoComplete="new-password"
@@ -380,6 +393,16 @@ export const Login = () => {
                             fontSize="sm"
                             fontWeight="500"
                             color={inputTextColor}
+                          />
+                          <IconButton
+                            variant="ghost"
+                            size="xs"
+                            aria-label={showSignupPassword ? 'Hide password' : 'Show password'}
+                            icon={showSignupPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                            color="#52796F"
+                            _hover={{ bg: 'transparent', opacity: 0.75 }}
+                            onClick={() => setShowSignupPassword((prev) => !prev)}
+                            tabIndex={-1}
                           />
                         </HStack>
                       </FormControl>

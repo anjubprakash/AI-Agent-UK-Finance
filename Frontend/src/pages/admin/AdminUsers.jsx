@@ -37,6 +37,8 @@ import {
   ModalBody,
   ModalFooter,
   ModalCloseButton,
+  InputGroup,
+  InputRightElement,
   useColorModeValue,
 } from '@chakra-ui/react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -53,6 +55,8 @@ import {
   Search,
   Upload,
   BookOpen,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 
 export const AdminUsers = () => {
@@ -64,6 +68,7 @@ export const AdminUsers = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState('ADMIN');
   const [department, setDepartment] = useState('Compliance Administration');
 
@@ -338,16 +343,30 @@ export const AdminUsers = () => {
 
                   <FormControl isRequired flex="1">
                     <FormLabel fontSize="xs" fontWeight="700" color={headingColor}>Initial Password</FormLabel>
-                    <Input
-                      type="password"
-                      placeholder="Min 8 characters"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      size="sm"
-                      borderRadius="lg"
-                      bg={inputBg}
-                      borderColor={inputBorder}
-                    />
+                    <InputGroup size="sm">
+                      <Input
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="Enter password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        borderRadius="lg"
+                        bg={inputBg}
+                        borderColor={inputBorder}
+                        pr="2.2rem"
+                      />
+                      <InputRightElement>
+                        <IconButton
+                          variant="ghost"
+                          size="xs"
+                          aria-label={showPassword ? 'Hide password' : 'Show password'}
+                          icon={showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                          color="#52796F"
+                          _hover={{ bg: 'transparent', opacity: 0.75 }}
+                          onClick={() => setShowPassword((prev) => !prev)}
+                          tabIndex={-1}
+                        />
+                      </InputRightElement>
+                    </InputGroup>
                   </FormControl>
 
                   <FormControl flex="1">

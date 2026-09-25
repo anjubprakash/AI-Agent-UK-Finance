@@ -45,11 +45,15 @@ export const askAgent = asyncHandler(async (req, res) => {
         });
       }
 
-      // Extract prior messages for contextual memory
+      // Extract prior messages for contextual memory (including cited rules from assistant turns)
       historyForMemory = (conversation.messages || []).map((m) => ({
         role: m.role,
-        content: m.content
+        content: m.content,
+        citedRules: m.citedRules || []
       }));
+      if (historyForMemory.length === 0 && Array.isArray(conversationHistory)) {
+        historyForMemory = conversationHistory;
+      }
     } catch (err) {
       console.warn('⚠️ Conversation lookup notice:', err.message);
     }

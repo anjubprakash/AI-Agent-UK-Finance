@@ -153,8 +153,8 @@ export const searchSimilarRules = async (queryText, limit = 5) => {
   }
 
   // 3. Extract rule code patterns & sourcebook identifiers (case-insensitive)
-  const SOURCEBOOKS_REGEX = /\b(CONC|FIT|PRIN|SYSC|COBS|MCOB|SUP|CASS|GEN|DISP|COCON|BCOBS|ICOBS|MAR|PROD)\b/gi;
-  const rulePattern = /\b(?:CONC|FIT|PRIN|SYSC|COBS|MCOB|SUP|CASS|GEN|DISP|COCON|BCOBS|ICOBS|MAR|PROD)\s*(?:[0-9]+[A-Z0-9]*(?:\.[0-9]+[A-Z0-9]*)*(?:-[0-9]+)?|TP\s*[0-9]+(?:\.[0-9]+)*|Sch\s*[0-9]+(?:\.[0-9]+)*)\b/gi;
+  const SOURCEBOOKS_REGEX = /\b(CONC|FIT|PRIN|SYSC|COBS|MCOB|SUP|CASS|GEN|DISP|COCON|BCOBS|ICOBS|MAR|PROD|FCG)\b/gi;
+  const rulePattern = /\b(?:CONC|FIT|PRIN|SYSC|COBS|MCOB|SUP|CASS|GEN|DISP|COCON|BCOBS|ICOBS|MAR|PROD|FCG)\s*(?:[0-9]+[A-Z0-9]*(?:\.[0-9]+[A-Z0-9]*)*(?:-[0-9]+)?|TP\s*[0-9]+(?:\.[0-9]+)*|Sch\s*[0-9]+(?:\.[0-9]+)*)\b/gi;
 
   const qLower = queryText.toLowerCase();
   const rawRuleMatches = (queryText.match(rulePattern) || []).map((r) => r.toLowerCase().replace(/\s+/g, ' '));
@@ -215,19 +215,34 @@ export const searchSimilarRules = async (queryText, limit = 5) => {
     }
   }
 
-  // Extract standalone sourcebook codes (e.g. "PRIN", "FIT", "SYSC", "COCON")
+  // Extract standalone sourcebook codes (e.g. "PRIN", "FIT", "SYSC", "COCON", "PROD", "DISP", "FCG")
   const standaloneSourcebooks = Array.from(new Set((queryText.match(SOURCEBOOKS_REGEX) || []).map((s) => s.toLowerCase())));
 
-  // Multi-sourcebook combined query support (e.g. "What is the difference between FIT and COCON")
+  // Multi-sourcebook combined query support (e.g. "PROD and DISP", "FCG and SUP")
   const embeddingModel = getEmbeddingModel();
   if (standaloneSourcebooks.length > 1 && embeddingModel) {
+    const qdrant = getQdrantClient();
+    const collectionName = env.QDRANT_COLLECTION_NAME;
     for (const sb of standaloneSourcebooks) {
       try {
-        const sbVec = await embeddingModel.embedQuery(`${sb} regulatory rules requirements`);
-        const sbRes = await searchRuleVectors(sbVec, limit * 2);
+        const sbVec = await embeddingModel.embedQuery(`${sb.toUpperCase()} ${queryText}`);
+        const sbRes = await searchRuleVectors(sbVec, limit * 4);
         for (const item of sbRes) {
           if (!semanticResults.some((ex) => ex.id === item.id)) {
             semanticResults.push(item);
+          }
+        }
+        // Also fetch direct sourcebook candidates from Qdrant payload filter so smaller sourcebooks are never drowned out by huge ones (like SUP)
+        if (qdrant) {
+          const directSbRes = await qdrant.scroll(collectionName, {
+            filter: { must: [{ key: 'title', match: { value: sb.toUpperCase() } }] },
+            limit: 25,
+            with_payload: true
+          });
+          for (const p of directSbRes?.points || []) {
+            if (!semanticResults.some((ex) => ex.id === p.id)) {
+              semanticResults.push({ id: p.id, score: 0.55, payload: p.payload });
+            }
           }
         }
       } catch (_) {}
@@ -445,6 +460,36 @@ export const searchSimilarRules = async (queryText, limit = 5) => {
       seenBody.add(substantiveBody);
       deduplicated.push(c);
     }
+  }
+
+  // If the query combines multiple sourcebooks (e.g. PROD + DISP, FCG + SUP), interleave top chunks across each sourcebook
+  if (standaloneSourcebooks.length > 1 && deduplicated.length > 0) {
+    const buckets = standaloneSourcebooks.map((sb) =>
+      deduplicated.filter((c) => {
+        const t = (c.payload?.title || '').toLowerCase();
+        const r = (c.payload?.ruleCode || '').toLowerCase();
+        return t === sb || t.includes(sb) || r.startsWith(sb) || r.includes(sb);
+      })
+    );
+    const balanced = [];
+    const usedIds = new Set();
+    let maxLen = Math.max(...buckets.map((b) => b.length), 0);
+    for (let i = 0; i < maxLen && balanced.length < limit; i++) {
+      for (const bucket of buckets) {
+        if (bucket[i] && !usedIds.has(bucket[i].id) && balanced.length < limit) {
+          balanced.push(bucket[i]);
+          usedIds.add(bucket[i].id);
+        }
+      }
+    }
+    for (const c of deduplicated) {
+      if (balanced.length >= limit) break;
+      if (!usedIds.has(c.id)) {
+        balanced.push(c);
+        usedIds.add(c.id);
+      }
+    }
+    return balanced.slice(0, limit);
   }
 
   return deduplicated.slice(0, limit);
