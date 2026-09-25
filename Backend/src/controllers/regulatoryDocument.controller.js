@@ -129,32 +129,6 @@ export const uploadRegulatoryDocument = asyncHandler(async (req, res) => {
       throw ApiError.badRequest(`AI Gatekeeper Rejected Document: ${aiVerification.reasoning}`);
     }
 
-    // 5. Check if any AI-detected rule code is already registered in the knowledge base
-    if (aiVerification.detectedRuleCodes && aiVerification.detectedRuleCodes.length > 0) {
-      for (const code of aiVerification.detectedRuleCodes) {
-        const sanitizedCode = code.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const existingRule = await RegulatoryDocument.findOne({
-          ruleCode: new RegExp(`^${sanitizedCode}$`, 'i'),
-          status: 'INDEXED'
-        });
-        if (existingRule) {
-          if (uploadId) {
-            uploadProgressTracker.set(uploadId, {
-              percent: 0,
-              stage: 'error',
-              message: `Duplicate document detected: Rule code '${code}' is already indexed as '${existingRule.title}'`,
-              status: 'FAILED'
-            });
-            setTimeout(() => uploadProgressTracker.delete(uploadId), 60 * 1000);
-          }
-          if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-          throw ApiError.badRequest(
-            `Duplicate document detected: Official rule code '${code}' is already registered and indexed in the knowledge base as '${existingRule.title}' (Version ${existingRule.version}, ${existingRule.chunkCount} chunks). To update this rulebook, use 'Update Version' in the Rules Library.`
-          );
-        }
-      }
-    }
-
     console.log(`✅ AI Gatekeeper approved '${originalFileName}': ${aiVerification.reasoning}`);
 
     if (uploadId) {
