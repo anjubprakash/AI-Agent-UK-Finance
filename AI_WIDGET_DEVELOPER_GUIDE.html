@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Embeddable AI Compliance Floating Widget — Master Developer & Architecture Guide</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    @page {
+      size: A4;
+      margin: 16mm 16mm 18mm 16mm;
+    }
+
+    @page :first {
+      margin: 0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #0F172A;
+      background: #FFFFFF;
+      line-height: 1.55;
+      font-size: 13px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ==========================================================================
+       PAGE 1: COVER PAGE
+       ========================================================================== */
+    .cover-page {
+      page-break-after: always;
+      height: 100vh;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      background: radial-gradient(circle at 50% 40%, #FFFFFF 0%, #F0FDF4 65%, #E6F4EA 100%);
+      padding: 60px 40px;
+      position: relative;
+    }
+
+    .cover-top-accent {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 7px;
+      background: linear-gradient(90deg, #1B3B33 0%, #10B981 50%, #2F5D50 100%);
+    }
+
+    .cover-badge {
+      display: inline-block;
+      background: #D1FAE5;
+      color: #065F46;
+      border: 1px solid #A7F3D0;
+      padding: 6px 18px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .cover-title {
+      font-size: 34px;
+      font-weight: 800;
+      color: #1B3B33;
+      line-height: 1.25;
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+
+    .cover-subtitle {
+      font-size: 15px;
+      color: #475569;
+      max-width: 680px;
+      line-height: 1.6;
+      margin-bottom: 36px;
+    }
+
+    .cover-divider {
+      width: 80px;
+      height: 3px;
+      background: #10B981;
+      border-radius: 2px;
+      margin-bottom: 40px;
+    }
+
+    .cover-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      max-width: 580px;
+      width: 100%;
+      margin-bottom: 48px;
+    }
+
+    .cover-meta-card {
+      background: #FFFFFF;
+      border: 1px solid #CBD5E1;
+      border-radius: 12px;
+      padding: 14px 18px;
+      text-align: left;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04);
+    }
+
+    .cover-meta-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #64748B;
+      margin-bottom: 4px;
+    }
+
+    .cover-meta-value {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #1B3B33;
+    }
+
+    .cover-footer {
+      position: absolute;
+      bottom: 30px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #64748B;
+      letter-spacing: 0.03em;
+    }
+
+    /* ==========================================================================
+       STANDARD INNER PAGES & HEADERS
+       ========================================================================== */
+    .page {
+      page-break-after: always;
+      position: relative;
+      padding-top: 10px;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #E2E8F0;
+      padding-bottom: 8px;
+      margin-bottom: 20px;
+      font-size: 10px;
+      font-weight: 600;
+      color: #64748B;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .page-header-title {
+      color: #1B3B33;
+      font-weight: 700;
+    }
+
+    h1, h2, h3, h4 {
+      color: #1B3B33;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    h1 {
+      font-size: 22px;
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #E2ECE7;
+    }
+
+    h2 {
+      font-size: 15.5px;
+      margin-top: 16px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h3 {
+      font-size: 13px;
+      margin-top: 12px;
+      margin-bottom: 6px;
+      color: #1B3B33;
+    }
+
+    p {
+      margin-bottom: 10px;
+      color: #334155;
+    }
+
+    ul, ol {
+      margin-left: 20px;
+      margin-bottom: 12px;
+      color: #334155;
+    }
+
+    li {
+      margin-bottom: 5px;
+    }
+
+    strong {
+      color: #0F172A;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      background: #F1F5F9;
+      color: #0F172A;
+      padding: 2px 5px;
+      border-radius: 4px;
+      border: 1px solid #E2E8F0;
+    }
+
+    /* ==========================================================================
+       TABLE OF CONTENTS (INDEX)
+       ========================================================================== */
+    .toc-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      background: #FFFFFF;
+      border: 1px solid #CBD5E1;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .toc-table th {
+      background: #1B3B33;
+      color: #FFFFFF;
+      padding: 10px 14px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      text-align: left;
+    }
+
+    .toc-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #E2E8F0;
+      font-size: 12px;
+      vertical-align: top;
+    }
+
+    .toc-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .toc-num {
+      font-weight: 800;
+      color: #1B3B33;
+      width: 45px;
+      font-size: 13px;
+    }
+
+    .toc-title {
+      font-weight: 700;
+      color: #0F172A;
+      font-size: 13px;
+      display: inline-block;
+    }
+
+    .toc-sub-list {
+      margin-top: 5px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .toc-sub-item {
+      color: #475569;
+      font-size: 11px;
+      padding-left: 10px;
+      border-left: 2px solid #CBD5E1;
+      line-height: 1.4;
+    }
+
+    .toc-page {
+      text-align: right;
+      font-weight: 700;
+      color: #2F5D50;
+      width: 80px;
+      font-size: 12px;
+    }
+
+    /* ==========================================================================
+       COMPONENT SPECIFICATION BOXES
+       ========================================================================== */
+    .component-box {
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 14px;
+      border-left: 5px solid;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
+    }
+
+    .frontend-box {
+      background: #F0FDF4;
+      border: 1px solid #BBF7D0;
+      border-left: 5px solid #10B981;
+    }
+
+    .backend-box {
+      background: #F8FAFC;
+      border: 1px solid #CBD5E1;
+      border-left: 5px solid #1B3B33;
+    }
+
+    .box-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    .box-title {
+      font-size: 12.5px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .frontend-title { color: #065F46; }
+    .backend-title { color: #1B3B33; }
+
+    .box-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+
+    .frontend-badge { background: #D1FAE5; color: #065F46; }
+    .backend-badge { background: #E2E8F0; color: #1E293B; }
+
+    /* ==========================================================================
+       SPEC & MATRIX TABLES
+       ========================================================================== */
+    .spec-table, .matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      margin-bottom: 14px;
+      font-size: 11.5px;
+      background: #FFFFFF;
+      border: 1px solid #CBD5E1;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .spec-table th, .matrix-table th {
+      background: #1B3B33;
+      color: #FFFFFF;
+      padding: 8px 12px;
+      font-weight: 700;
+      text-align: left;
+      font-size: 11px;
+      letter-spacing: 0.03em;
+    }
+
+    .spec-table td, .matrix-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #E2E8F0;
+      vertical-align: middle;
+      color: #334155;
+    }
+
+    .spec-table tr:last-child td,
+    .matrix-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .matrix-table tr:nth-child(even) {
+      background: #F8FAFC;
+    }
+
+    .status-pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-size: 10.5px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .status-allowed { background: #D1FAE5; color: #065F46; border: 1px solid #A7F3D0; }
+    .status-restricted { background: #F1F5F9; color: #64748B; border: 1px solid #E2E8F0; }
+    .status-preview { background: #DBEAFE; color: #1E40AF; border: 1px solid #BFDBFE; }
+
+    /* ==========================================================================
+       FLOWCHARTS & CARDS
+       ========================================================================== */
+    .diagram-container {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 14px;
+      margin: 12px 0;
+      text-align: center;
+    }
+
+    .flow-steps {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      margin: 10px 0;
+    }
+
+    .flow-step-card {
+      background: #FFFFFF;
+      border: 1px solid #CBD5E1;
+      border-radius: 8px;
+      padding: 8px 6px;
+      flex: 1;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .flow-step-num {
+      font-size: 9.5px;
+      font-weight: 800;
+      color: #10B981;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .flow-step-name {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #0F172A;
+      line-height: 1.25;
+    }
+
+    .flow-step-desc {
+      font-size: 9px;
+      color: #64748B;
+      margin-top: 2px;
+    }
+
+    .flow-arrow {
+      color: #94A3B8;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    /* ==========================================================================
+       CODE BLOCKS
+       ========================================================================== */
+    pre {
+      background: #0F172A;
+      color: #F8FAFC;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      line-height: 1.45;
+      overflow-x: auto;
+      margin: 8px 0 12px 0;
+      border: 1px solid #1E293B;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================================
+       PAGE 1: COVER PAGE
+       ======================================================================== -->
+  <div class="cover-page">
+    <div class="cover-top-accent"></div>
+
+    <h1 class="cover-title">
+      Embeddable AI Compliance<br>Floating Widget
+    </h1>
+
+    <p class="cover-subtitle">
+      Architectural Specification, Developer Implementation Guide, Data Flow Pipeline, and Omnichannel Intranet Integration
+    </p>
+
+    <div class="cover-divider"></div>
+
+    <div class="cover-meta-grid">
+      <div class="cover-meta-card">
+        <div class="cover-meta-label">Integration Targets</div>
+        <div class="cover-meta-value">React Component • Iframe • Script Tag</div>
+      </div>
+      <div class="cover-meta-card">
+        <div class="cover-meta-label">Inference Engine</div>
+        <div class="cover-meta-value">Groq Cloud (Sub-second LPU)</div>
+      </div>
+      <div class="cover-meta-card">
+        <div class="cover-meta-label">Caching Architecture</div>
+        <div class="cover-meta-value">Zero-RAM Persistent Cache</div>
+      </div>
+      <div class="cover-meta-card">
+        <div class="cover-meta-label">Security & Authentication</div>
+        <div class="cover-meta-value">Guest UUID • Optional JWT • CORS</div>
+      </div>
+    </div>
+
+    <div class="cover-footer">
+      Embeddable AI Compliance Floating Widget
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       PAGE 2: MASTER TABLE OF CONTENTS (INDEX)
+       ======================================================================== -->
+  <div class="page">
+    <div class="page-header">
+      <span class="page-header-title">Master Table of Contents</span>
+      <span>Executive Index</span>
+    </div>
+
+    <h1>Master Table of Contents</h1>
+
+    <table class="toc-table">
+      <thead>
+        <tr>
+          <th>Sec</th>
+          <th>Subject / Module Title</th>
+          <th style="text-align: right;">Page</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="toc-num">1.</td>
+          <td>
+            <span class="toc-title">Executive Overview & Core Purpose</span>
+            <div class="toc-sub-list">
+              <div class="toc-sub-item">1.1 What is the Embeddable Floating AI Widget?</div>
+              <div class="toc-sub-item">1.2 Enterprise Banking & Intranet Use Cases</div>
+              <div class="toc-sub-item">1.3 Single AI Brain, Multiple Frontends Principle</div>
+            </div>
+          </td>
+          <td class="toc-page">Page 3</td>
+        </tr>
+        <tr>
+          <td class="toc-num">2.</td>
+          <td>
+            <span class="toc-title">System Comparison & Technology Stack</span>
+            <div class="toc-sub-list">
+              <div class="toc-sub-item">2.1 Full Compliance Portal vs. Floating Assistant Matrix</div>
+              <div class="toc-sub-item">2.2 Frontend Package Ecosystem (React, Chakra, Lucide)</div>
+              <div class="toc-sub-item">2.3 Backend & Infrastructure Package Ecosystem</div>
+            </div>
+          </td>
+          <td class="toc-page">Page 4</td>
+        </tr>
+        <tr>
+          <td class="toc-num">3.</td>
+          <td>
+            <span class="toc-title">End-to-End Data Flow & Sequence Architecture</span>
+            <div class="toc-sub-list">
+              <div class="toc-sub-item">3.1 Step-by-Step Visual Data Flow Pipeline</div>
+              <div class="toc-sub-item">3.2 Streamlined Inquiry Lifecycle (5 Clear Stages)</div>
+            </div>
+          </td>
+          <td class="toc-page">Page 5</td>
+        </tr>
+        <tr>
+          <td class="toc-num">4.</td>
+          <td>
+            <span class="toc-title">Advantages, Disadvantages & Strategic Trade-offs</span>
+            <div class="toc-sub-list">
+              <div class="toc-sub-item">4.1 Key Strategic Advantages</div>
+              <div class="toc-sub-item">4.2 Engineering Limitations & Trade-offs</div>
+              <div class="toc-sub-item">4.3 Production Mitigation Strategies</div>
+            </div>
+          </td>
+          <td class="toc-page">Page 6</td>
+        </tr>
+        <tr>
+          <td class="toc-num">5.</td>
+          <td>
+            <span class="toc-title">Backend Engine & API Architecture (3 Simple Steps)</span>
+            <div class="toc-sub-list">
+              <div class="toc-sub-item">5.1 Step 1: The Gateway Route (optionalAuthenticate)</div>
+              <div class="toc-sub-item">5.2 Step 2: Multi-Turn Guest Memory (widgetSessionId)</div>
+              <div class="toc-sub-item">5.3 Step 3: Small-Screen Adaptation (isWidget: true)</div>
+            </div>
+          </td>
+          <td class="toc-page">Page 7</td>
+        </tr>
+        <tr>
+          <td class="toc-num">6.</td>
+          <td>
+            <span class="toc-title">Frontend Implementation & UX Design (3 Simple Steps)</span>
+            <div class="toc-sub-list">
+              <div class="toc-sub-item">6.1 Step 1: Session UUID in localStorage</div>
+              <div class="toc-sub-item">6.2 Step 2: Focus & Scroll Lock (Backdrop Blur)</div>
+              <div class="toc-sub-item">6.3 Step 3: Floating Launcher & Modal Layout</div>
+            </div>
+          </td>
+          <td class="toc-page">Page 8</td>
+        </tr>
+        <tr>
+          <td class="toc-num">7.</td>
+          <td>
+            <span class="toc-title">Step-by-Step Developer Implementation Roadmap</span>
+            <div class="toc-sub-list">
+              <div class="toc-sub-item">7.1 Step 1: Set Up Backend Route & CORS</div>
+              <div class="toc-sub-item">7.2 Step 2: Store Session ID on Client</div>
+              <div class="toc-sub-item">7.3 Step 3: Pin Floating Launcher to Bottom-Right</div>
+              <div class="toc-sub-item">7.4 Step 4: Add Mobile-Friendly Prompt Rules</div>
+            </div>
+          </td>
+          <td class="toc-page">Page 9</td>
+        </tr>
+        <tr>
+          <td class="toc-num">8.</td>
+          <td>
+            <span class="toc-title">Omnichannel Embedding & Live Test Environments</span>
+            <div class="toc-sub-list">
+              <div class="toc-sub-item">8.1 Method A: React Drop-in Component</div>
+              <div class="toc-sub-item">8.2 Method B: Isolated Iframe Embed</div>
+              <div class="toc-sub-item">8.3 Method C: Script Tag Loader (widget.js)</div>
+              <div class="toc-sub-item">8.4 Live Verification & Test Environments</div>
+            </div>
+          </td>
+          <td class="toc-page">Page 10</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ========================================================================
+       PAGE 3: 1. EXECUTIVE OVERVIEW & CORE PURPOSE
+       ======================================================================== -->
+  <div class="page">
+    <div class="page-header">
+      <span class="page-header-title">1. Executive Overview & Core Purpose</span>
+      <span>Omnichannel Compliance Intelligence</span>
+    </div>
+
+    <h1>1. Executive Overview & Core Purpose</h1>
+
+    <h2>1.1 What is the Embeddable Floating AI Widget?</h2>
+    <p>The <strong>Embeddable Floating AI Compliance Widget</strong> (<code>ComplianceWidget.jsx</code>) is a self-contained, lightweight, interactive chat assistant designed to float in the bottom-right corner of any web application. It provides users with immediate, context-aware answers to UK financial regulatory questions (FCA, PRA, Bank of England) without redirecting them away from their active workflow or forcing them to create an account.</p>
+
+    <h2>1.2 Enterprise Banking & Intranet Use Cases</h2>
+    <p>In modern financial institutions, regulatory compliance is not confined to a single back-office portal. Compliance inquiries occur across diverse operational touchpoints:</p>
+
+    <ul>
+      <li><strong>Internal Banking Intranets</strong>: Loan officers, trading desk personnel, and relationship managers can verify regulatory clauses (e.g. <em>Consumer Duty PRIN 2A</em> or <em>CASS 7 Client Money segregation</em>) while reviewing client agreements.</li>
+      <li><strong>Customer-Facing Banking Portals</strong>: Retail and corporate banking customers can access plain-English explanations of statutory rights, complaint timelines (<em>DISP 1.6</em>), and dispute mechanisms.</li>
+      <li><strong>Third-Party Partner Websites</strong>: Independent mortgage brokers, financial advisers, and fintech partners can embed the firm's compliance intelligence via a simple <code>&lt;iframe&gt;</code> without any codebase dependencies.</li>
+      <li><strong>Guest User Onboarding</strong>: Prospective clients and unauthenticated visitors can test the assistant with zero login friction.</li>
+    </ul>
+
+    <h2>1.3 Single AI Brain, Multiple Frontends Principle</h2>
+    <p>The floating widget is <strong>not</strong> an independent or stripped-down AI model. It is a client-side presentation layer that connects directly to the <strong>centralized UK Finance AI Compliance Engine</strong>. Both the full-screen desktop dashboard (<code>/chat</code>) and the floating widget share:</p>
+
+    <ul>
+      <li>The same <strong>Zero-RAM Persistent Caching System</strong> (MongoDB Persistent Cache + Qdrant Semantic Vector Cache).</li>
+      <li>The same <strong>Qdrant Vector Database</strong> containing auto-indexed FCA/PRA rule chunks.</li>
+      <li>The same <strong>Sub-Second Groq LLM Inference</strong> (<code>openai/gpt-oss-120b</code> on LPU hardware).</li>
+      <li>The same <strong>AI Gatekeeper & Master System Prompt</strong> guardrails.</li>
+    </ul>
+  </div>
+
+  <!-- ========================================================================
+       PAGE 4: 2. SYSTEM COMPARISON & TECHNOLOGY STACK
+       ======================================================================== -->
+  <div class="page">
+    <div class="page-header">
+      <span class="page-header-title">2. Comparison & Technology Stack</span>
+      <span>Package Ecosystem</span>
+    </div>
+
+    <h1>2. System Comparison & Technology Stack</h1>
+
+    <h2>2.1 Full Compliance Portal vs. Floating Assistant Matrix</h2>
+
+    <table class="matrix-table">
+      <thead>
+        <tr>
+          <th>Architectural Feature</th>
+          <th>Full Compliance Portal (<code>/chat</code>)</th>
+          <th>Floating AI Widget (<code>/widget</code>, <code>/test</code>)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Primary User Experience</strong></td>
+          <td>Dedicated multi-column desktop studio</td>
+          <td>380px floating popup with backdrop overlay</td>
+        </tr>
+        <tr>
+          <td><strong>Authentication Policy</strong></td>
+          <td>Mandatory login (<code>Bearer JWT</code> required)</td>
+          <td><span class="status-pill status-allowed">Guest-friendly (Optional JWT)</span></td>
+        </tr>
+        <tr>
+          <td><strong>Session Identification</strong></td>
+          <td>MongoDB <code>Conversation</code> tied to <code>userId</code></td>
+          <td>MongoDB <code>Conversation</code> tied to <code>widgetSessionId</code></td>
+        </tr>
+        <tr>
+          <td><strong>Output Formatting</strong></td>
+          <td>Exhaustive paragraphs & wide Markdown tables</td>
+          <td><span class="status-pill status-allowed">Concise 3–5 bullets (tables suppressed)</span></td>
+        </tr>
+        <tr>
+          <td><strong>Conversational Memory</strong></td>
+          <td>Full multi-turn conversation sidebar</td>
+          <td>In-memory session thread with reset button</td>
+        </tr>
+        <tr>
+          <td><strong>Integration Method</strong></td>
+          <td>Internal React Router protected route</td>
+          <td>Drop-in React component OR <code>&lt;iframe&gt;</code> tag</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>2.2 Frontend Package Ecosystem (<code>frontend/package.json</code>)</h2>
+    <table class="spec-table">
+      <tr>
+        <th style="width: 28%;">Package & Version</th>
+        <th>Purpose in Floating Widget Architecture</th>
+      </tr>
+      <tr>
+        <td><code>react</code> (<code>^18.3.1</code>)</td>
+        <td>Declarative component lifecycle, reactive state (<code>useState</code>), and effects (<code>useEffect</code>).</td>
+      </tr>
+      <tr>
+        <td><code>@chakra-ui/react</code> (<code>^2.8.2</code>)</td>
+        <td>Floating container layout (<code>Box</code>, <code>Flex</code>), animated transitions, and compliance color theming.</td>
+      </tr>
+      <tr>
+        <td><code>lucide-react</code> (<code>^0.395.0</code>)</td>
+        <td>Clean SVG iconography (<code>MessageSquare</code>, <code>X</code>, <code>RotateCcw</code>, <code>ShieldCheck</code>, <code>Send</code>).</td>
+      </tr>
+      <tr>
+        <td><code>react-markdown</code> + <code>remark-gfm</code></td>
+        <td>Renders LLM Markdown responses into clean HTML directly inside the chat bubbles with GFM table support.</td>
+      </tr>
+      <tr>
+        <td><code>axios</code> (<code>^1.7.2</code>)</td>
+        <td>Promise-based HTTP client for dispatching queries and resetting widget sessions.</td>
+      </tr>
+    </table>
+
+    <h2>2.3 Backend & Infrastructure Package Ecosystem (<code>backend/package.json</code>)</h2>
+    <table class="spec-table">
+      <tr>
+        <th style="width: 28%;">Package & Version</th>
+        <th>Role in Backend & API Engine</th>
+      </tr>
+      <tr>
+        <td><code>express</code> (<code>^5.2.1</code>)</td>
+        <td>Asynchronous REST routing, middleware pipeline, and error handling.</td>
+      </tr>
+      <tr>
+        <td><code>cors</code> (<code>^2.8.6</code>)</td>
+        <td>Enables secure cross-origin resource sharing for external domain embedding.</td>
+      </tr>
+      <tr>
+        <td><code>mongoose</code> (<code>^9.9.5</code>)</td>
+        <td>ODM managing MongoDB connections, session schemas, and audit trails.</td>
+      </tr>
+      <tr>
+        <td><code>groq-sdk</code> (<code>^1.6.0</code>)</td>
+        <td>Ultra-fast LPU inference executing <code>openai/gpt-oss-120b</code> in &lt;1000ms.</td>
+      </tr>
+      <tr>
+        <td><code>@qdrant/js-client-rest</code></td>
+        <td>High-speed vector similarity search across regulatory clauses and semantic cache.</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ========================================================================
+       PAGE 5: 3. END-TO-END DATA FLOW & SEQUENCE ARCHITECTURE
+       ======================================================================== -->
+  <div class="page">
+    <div class="page-header">
+      <span class="page-header-title">3. Data Flow & Sequence Architecture</span>
+      <span>Lifecycle of a Widget Inquiry</span>
+    </div>
+
+    <h1>3. End-to-End Data Flow & Sequence Architecture</h1>
+
+    <div class="diagram-container">
+      <div style="font-weight: 700; font-size: 12px; color: #1B3B33; margin-bottom: 12px;">
+        WIDGET INQUIRY LIFECYCLE & HYBRID CACHE INTERCEPTION
+      </div>
+
+      <div class="flow-steps">
+        <div class="flow-step-card">
+          <div class="flow-step-num">Step 1</div>
+          <div class="flow-step-name">User Query</div>
+          <div class="flow-step-desc">Widget launcher</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step-card">
+          <div class="flow-step-num">Step 2</div>
+          <div class="flow-step-name">Session ID</div>
+          <div class="flow-step-desc">localStorage UUID</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step-card" style="border-color: #10B981; background: #F0FDF4;">
+          <div class="flow-step-num" style="color: #059669;">Step 3</div>
+          <div class="flow-step-name">Persistent Cache</div>
+          <div class="flow-step-desc">MongoDB & Vector</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step-card">
+          <div class="flow-step-num">Step 4</div>
+          <div class="flow-step-name">Qdrant Top 4</div>
+          <div class="flow-step-desc">Rule chunks</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step-card" style="border-color: #6366F1; background: #EEF2FF;">
+          <div class="flow-step-num" style="color: #4F46E5;">Step 5</div>
+          <div class="flow-step-name">Groq LLM</div>
+          <div class="flow-step-desc">3–5 bullets JSON</div>
+        </div>
+      </div>
+    </div>
+
+    <h2>3.2 Streamlined Inquiry Lifecycle (5 Clear Stages)</h2>
+    <ol>
+      <li><strong>1. Open & Dim Background</strong>: The user clicks the floating launcher button. The widget smoothly dims the host website with a soft blur and displays the chat window.</li>
+      <li><strong>2. Guest Session Check</strong>: The widget checks browser <code>localStorage</code> for an existing session ID (or creates a new one) so previous questions are remembered.</li>
+      <li><strong>3. Instant Cache Check</strong>: The system checks MongoDB Persistent Cache and Qdrant Semantic Vector Cache (Zero RAM). If answered before, it returns immediately in <strong>18ms (0 tokens!)</strong>.</li>
+      <li><strong>4. Regulatory AI Retrieval</strong>: If the question is new, Qdrant retrieves the top 4 relevant FCA/PRA rule clauses and Groq LLM writes a concise 3–5 bullet answer.</li>
+      <li><strong>5. Display Answer & Citations</strong>: The widget cleanly displays the advice with bold regulatory rule badges (e.g. <code>DISP 1.6.2 R</code>) and clickable follow-up chips.</li>
+    </ol>
+  </div>
+
+  <!-- ========================================================================
+       PAGE 6: 4. ADVANTAGES, DISADVANTAGES & STRATEGIC TRADE-OFFS
+       ======================================================================== -->
+  <div class="page">
+    <div class="page-header">
+      <span class="page-header-title">4. Strategic Trade-offs</span>
+      <span>Advantages & Considerations</span>
+    </div>
+
+    <h1>4. Advantages, Disadvantages & Strategic Trade-offs</h1>
+
+    <h2>4.1 Key Strategic Advantages</h2>
+    <ul>
+      <li><strong>Zero User Friction</strong>: Users get instant regulatory compliance advice without logging in, creating accounts, or navigating away from their current task.</li>
+      <li><strong>100% Centralized AI Brain</strong>: Embedded websites do not need to host AI models or maintain vector stores. All intelligence runs on the centralized backend.</li>
+      <li><strong>Full Caching Economics</strong>: Enjoys persistent caching benefits with zero RAM footprint. Repeated or paraphrased questions return in <strong>18ms at 0 token cost</strong>.</li>
+      <li><strong>Intelligent Small-Screen Formatting</strong>: Eliminates table overflow by automatically summarizing multi-column comparisons into 3–5 compact bullets.</li>
+      <li><strong>Persistent Multi-Turn Memory</strong>: Users can ask natural follow-up questions (<em>"What must they do if it expires?"</em>) without losing conversational context.</li>
+      <li><strong>Universal Drop-in Integration</strong>: Integrates into React applications as a drop-in component, or into WordPress, Webflow, and custom HTML via a standard <code>&lt;iframe&gt;</code> or 1-line script.</li>
+    </ul>
+
+    <h2>4.2 Engineering Limitations & Trade-offs</h2>
+
+    <table class="matrix-table">
+      <thead>
+        <tr>
+          <th>Limitation</th>
+          <th>Impact on User Experience</th>
+          <th>Architectural Reason</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Screen Real Estate</strong></td>
+          <td>Cannot comfortably render 10-column tables or multi-page documents.</td>
+          <td>The popup is constrained to 380px–400px width to avoid obstructing mobile screens.</td>
+        </tr>
+        <tr>
+          <td><strong>Client-Side Session Scope</strong></td>
+          <td>Clearing browser cookies/cache resets the conversational thread.</td>
+          <td>Guest sessions rely on <code>localStorage</code> UUIDs rather than persistent database user accounts.</td>
+        </tr>
+        <tr>
+          <td><strong>Cross-Origin Restrictions</strong></td>
+          <td>Iframes require explicit CORS headers and sandbox permissions.</td>
+          <td>Web browsers enforce strict cross-origin policies for embedded iframes.</td>
+        </tr>
+        <tr>
+          <td><strong>No Admin Controls</strong></td>
+          <td>Document uploads and user management cannot be performed from the widget.</td>
+          <td>The widget is intentionally locked to <code>EMPLOYEE</code> / <code>GUEST</code> query capabilities for security.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>4.3 Production Mitigation Strategies</h2>
+    <ul>
+      <li><strong>Table Request Override</strong>: If the user explicitly asks for a table (<em>"Show me a comparison table..."</em>), the backend detects the keyword and renders a compact Markdown table.</li>
+      <li><strong>Session Reset Button</strong>: An integrated reset button (<code>RotateCcw</code>) allows users to wipe their <code>widgetSessionId</code> and start a clean thread at any time.</li>
+      <li><strong>Permissive CORS Configuration</strong>: The Express backend uses <code>cors({ origin: true, credentials: true })</code> to allow seamless embedding on partner banking domains.</li>
+    </ul>
+  </div>
+
+  <!-- ========================================================================
+       PAGE 7: 5. BACKEND ENGINE & API ARCHITECTURE (3 SIMPLE STEPS)
+       ======================================================================== -->
+  <div class="page">
+    <div class="page-header">
+      <span class="page-header-title">5. Backend Implementation</span>
+      <span>3 Simple Backend Steps</span>
+    </div>
+
+    <h1>5. Backend Engine & API Architecture (3 Simple Steps)</h1>
+
+    <div class="component-box backend-box">
+      <div class="box-header">
+        <span class="box-title backend-title">Step 1: The Gateway Route (Accepts Both Guests & Users)</span>
+        <span class="box-badge backend-badge">Express Route</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">Use <code>optionalAuthenticate</code> middleware so visitors can query immediately without logging in, while automatically attaching logged-in users to their profile:</p>
+      <pre><code>// In routes/agent.routes.js:
+router.post('/query', optionalAuthenticate, askAgent);
+router.delete('/widget/session/:widgetSessionId', clearWidgetSession);</code></pre>
+    </div>
+
+    <div class="component-box backend-box">
+      <div class="box-header">
+        <span class="box-title backend-title">Step 2: Multi-Turn Guest Memory (Tied to Session ID)</span>
+        <span class="box-badge backend-badge">Controller Logic</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">Instead of requiring a user account, retrieve the conversation thread using the client's <code>widgetSessionId</code>. This gives guests full conversational pronoun memory:</p>
+      <pre><code>// In controllers/agent.controller.js:
+const conversation = await Conversation.findOneAndUpdate(
+  { widgetSessionId, isArchived: false },
+  { $setOnInsert: { source: 'WIDGET', messages: [] } },
+  { upsert: true, new: true }
+);</code></pre>
+    </div>
+
+    <div class="component-box backend-box">
+      <div class="box-header">
+        <span class="box-title backend-title">Step 3: Small-Screen Adaptation (Bullet Output Mode)</span>
+        <span class="box-badge backend-badge">LLM Prompt Rule</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">When <code>isWidget: true</code> is received, instruct the Groq LLM to return 3 to 5 compact bullets and suppress wide tables unless explicitly requested:</p>
+      <pre><code>// In services/ragAgent.service.js:
+if (isWidget && !askedForTable) {
+  prompt += "WIDGET MODE: Keep answers concise (3-5 short bullets). Do NOT output tables.";
+}</code></pre>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       PAGE 8: 6. FRONTEND IMPLEMENTATION & UX DESIGN (3 SIMPLE STEPS)
+       ======================================================================== -->
+  <div class="page">
+    <div class="page-header">
+      <span class="page-header-title">6. Frontend Implementation</span>
+      <span>3 Simple Frontend Steps</span>
+    </div>
+
+    <h1>6. Frontend Implementation & UX Design (3 Simple Steps)</h1>
+
+    <div class="component-box frontend-box">
+      <div class="box-header">
+        <span class="box-title frontend-title">Step 1: Session ID Generator (Persistent in Browser)</span>
+        <span class="box-badge frontend-badge">Client Storage</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">Store a unique guest ID in <code>localStorage</code> so switching pages doesn't wipe the conversation:</p>
+      <pre><code>// In components/widget/ComplianceWidget.jsx:
+const getSessionId = () => {
+  let id = localStorage.getItem('widget_session_id');
+  if (!id) {
+    id = 'wgt_' + Math.random().toString(36).substring(2, 10);
+    localStorage.setItem('widget_session_id', id);
+  }
+  return id;
+};</code></pre>
+    </div>
+
+    <div class="component-box frontend-box">
+      <div class="box-header">
+        <span class="box-title frontend-title">Step 2: Focus & Scroll Lock (UX Polish)</span>
+        <span class="box-badge frontend-badge">UX Mechanics</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">When the popup opens, dim the background page and freeze the host page scroll so mouse wheel scrolling stays inside the chat card:</p>
+      <pre><code>useEffect(() => {
+  document.body.style.overflow = isOpen ? 'hidden' : 'auto';
+  return () => { document.body.style.overflow = 'auto'; };
+}, [isOpen]);</code></pre>
+    </div>
+
+    <div class="component-box frontend-box">
+      <div class="box-header">
+        <span class="box-title frontend-title">Step 3: Floating Launcher & Modal Layout</span>
+        <span class="box-badge frontend-badge">CSS Positioning</span>
+      </div>
+      <p style="font-size: 11.5px; margin-bottom: 6px;">Pin the launcher button and popup window to the bottom-right corner using fixed positioning:</p>
+      <pre><code>&lt;div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 9999 }}&gt;
+  {isOpen && &lt;ChatCard onClose={() => setIsOpen(false)} /&gt;}
+  &lt;button onClick={() => setIsOpen(!isOpen)}&gt;Ask Compliance AI&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       PAGE 9: 7. STEP-BY-STEP DEVELOPER IMPLEMENTATION ROADMAP
+       ======================================================================== -->
+  <div class="page">
+    <div class="page-header">
+      <span class="page-header-title">7. Implementation Roadmap</span>
+      <span>4-Step Developer Checklist</span>
+    </div>
+
+    <h1>7. Step-by-Step Developer Implementation Roadmap</h1>
+
+    <p style="margin-bottom: 14px;">Follow this practical checklist to implement this floating assistant on any new stack or host application:</p>
+
+    <div class="diagram-container" style="margin-bottom: 14px;">
+      <div class="flow-steps">
+        <div class="flow-step-card">
+          <div class="flow-step-num">Step 1</div>
+          <div class="flow-step-name">Backend API</div>
+          <div class="flow-step-desc">Route & CORS</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step-card">
+          <div class="flow-step-num">Step 2</div>
+          <div class="flow-step-name">Session ID</div>
+          <div class="flow-step-desc">localStorage UUID</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step-card">
+          <div class="flow-step-num">Step 3</div>
+          <div class="flow-step-name">Floating UI</div>
+          <div class="flow-step-desc">Bottom-right CSS</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step-card">
+          <div class="flow-step-num">Step 4</div>
+          <div class="flow-step-name">LLM Prompts</div>
+          <div class="flow-step-desc">3–5 bullets mode</div>
+        </div>
+      </div>
+    </div>
+
+    <table class="matrix-table">
+      <thead>
+        <tr>
+          <th style="width: 25%;">Implementation Step</th>
+          <th>What You Need to Do</th>
+          <th style="width: 20%;">Key Benefit</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>1. Setup Backend Route</strong></td>
+          <td>Create a POST endpoint that accepts <code>{ question, widgetSessionId, isWidget }</code> with CORS enabled.</td>
+          <td><span class="status-pill status-allowed">Cross-Domain Access</span></td>
+        </tr>
+        <tr>
+          <td><strong>2. Store Client Session</strong></td>
+          <td>On the client, check <code>localStorage</code> for a session ID. Pass it with every request.</td>
+          <td><span class="status-pill status-allowed">Guest Pronoun Memory</span></td>
+        </tr>
+        <tr>
+          <td><strong>3. Pin Floating Button</strong></td>
+          <td>Use CSS <code>position: fixed; bottom: 24px; right: 24px; z-index: 9999</code> for the trigger button.</td>
+          <td><span class="status-pill status-allowed">Zero Page Interference</span></td>
+        </tr>
+        <tr>
+          <td><strong>4. Mobile Prompt Rules</strong></td>
+          <td>When <code>isWidget</code> is true, tell LLM: <em>"Output 3-5 bullets. Do not render tables."</em></td>
+          <td><span class="status-pill status-allowed">Zero Horizontal Scroll</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ========================================================================
+       PAGE 10: 8. OMNICHANNEL EMBEDDING & LIVE TEST ENVIRONMENTS
+       ======================================================================== -->
+  <div class="page">
+    <div class="page-header">
+      <span class="page-header-title">8. Embedding & Verification</span>
+      <span>Omnichannel Integration</span>
+    </div>
+
+    <h1>8. Omnichannel Embedding & Live Test Environments</h1>
+
+    <h2>8.1 Method A: React Drop-in Component</h2>
+    <p>For applications running React, import and render the component directly:</p>
+
+    <pre><code>import { ComplianceWidget } from './components/widget/ComplianceWidget.jsx';
+
+export default function BankingPortal() {
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;Internal Commercial Banking Portal&lt;/h1&gt;
+      &lt;ComplianceWidget mode="floating" defaultOpen={false} /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+    <h2>8.2 Method B: Isolated <code>&lt;iframe&gt;</code> Embed</h2>
+    <p>For WordPress, Webflow, static HTML, or partner intranets:</p>
+
+    <pre><code>&lt;iframe
+  src="http://localhost:8080/widget?embed=true"
+  width="400"
+  height="600"
+  style="position:fixed; bottom:20px; right:20px; border:none; z-index:99999; border-radius:20px; box-shadow:0 20px 50px rgba(0,0,0,0.25);"
+  title="AI Compliance Assistant"
+&gt;&lt;/iframe&gt;</code></pre>
+
+    <h2>8.3 Method C: Script Tag Loader (<code>widget.js</code>)</h2>
+    <pre><code>&lt;script src="http://localhost:8080/widget.js" defer&gt;&lt;/script&gt;</code></pre>
+
+    <h2>8.4 Live Verification & Test Environments</h2>
+    <table class="spec-table">
+      <tr>
+        <th style="width: 35%;">Test Environment</th>
+        <th>Live URL & Verification Purpose</th>
+      </tr>
+      <tr>
+        <td><strong>Interactive Widget Studio</strong></td>
+        <td><code>http://localhost:8080/widget</code> — Standalone simulator with live controls.</td>
+      </tr>
+      <tr>
+        <td><strong>Isolated Iframe Container</strong></td>
+        <td><code>http://localhost:8080/widget?embed=true</code> — Clean iframe testing container.</td>
+      </tr>
+      <tr>
+        <td><strong>External Partner Bank Portal</strong></td>
+        <td><code>http://localhost:8080/test</code> — Simulated 3rd-party banking website demonstrating floating launcher, backdrop dimming, and scroll lock.</td>
+      </tr>
+    </table>
+  </div>
+
+</body>
+</html>

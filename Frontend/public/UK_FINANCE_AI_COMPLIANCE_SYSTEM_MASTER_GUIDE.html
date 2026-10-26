@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>UK Financial Rules AI Compliance Assistant — Master Documentation</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    @page {
+      size: A4;
+      margin: 16mm 16mm 18mm 16mm;
+    }
+
+    @page :first {
+      margin: 0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #0F172A;
+      background: #FFFFFF;
+      line-height: 1.55;
+      font-size: 13px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ==========================================================================
+       PAGE 1: COVER PAGE (TITLE EXACTLY CENTERED, NO COMPANY NAME)
+       ========================================================================== */
+    .cover-page {
+      page-break-after: always;
+      height: 100vh;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      background: radial-gradient(circle at 50% 40%, #FFFFFF 0%, #F0FDF4 65%, #E6F4EA 100%);
+      padding: 60px 40px;
+      position: relative;
+    }
+
+    .cover-top-accent {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 8px;
+      background: linear-gradient(90deg, #1B3B33 0%, #2F5D50 50%, #10B981 100%);
+    }
+
+    .cover-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #E6F4EA;
+      border: 1px solid #A7F3D0;
+      color: #1B3B33;
+      padding: 6px 18px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .cover-title {
+      font-size: 34px;
+      font-weight: 800;
+      color: #1B3B33;
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+      max-width: 680px;
+      margin: 0 auto 16px auto;
+    }
+
+    .cover-subtitle {
+      font-size: 16px;
+      font-weight: 500;
+      color: #334155;
+      max-width: 580px;
+      margin: 0 auto 32px auto;
+      line-height: 1.5;
+    }
+
+    .cover-divider {
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(90deg, #1B3B33, #10B981);
+      border-radius: 2px;
+      margin: 0 auto 36px auto;
+    }
+
+    .cover-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      max-width: 520px;
+      width: 100%;
+      margin: 0 auto;
+      text-align: left;
+    }
+
+    .cover-meta-card {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid #CBD5E1;
+      padding: 12px 16px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+    }
+
+    .cover-meta-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #64748B;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+
+    .cover-meta-value {
+      font-size: 12px;
+      font-weight: 600;
+      color: #0F172A;
+    }
+
+    .cover-footer {
+      position: absolute;
+      bottom: 24px;
+      left: 0;
+      right: 0;
+      font-size: 11px;
+      color: #64748B;
+      font-weight: 500;
+    }
+
+    /* ==========================================================================
+       INNER PAGES & TYPOGRAPHY
+       ========================================================================== */
+    .page {
+      page-break-after: always;
+      padding-top: 10px;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #E2E8F0;
+      padding-bottom: 8px;
+      margin-bottom: 20px;
+      font-size: 10px;
+      font-weight: 600;
+      color: #64748B;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .page-header-title {
+      color: #1B3B33;
+      font-weight: 700;
+    }
+
+    h1, h2, h3, h4 {
+      color: #1B3B33;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    h1 {
+      font-size: 22px;
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #E2ECE7;
+    }
+
+    h2 {
+      font-size: 16px;
+      margin-top: 18px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h3 {
+      font-size: 13.5px;
+      margin-top: 12px;
+      margin-bottom: 6px;
+      color: #1B3B33;
+    }
+
+    p {
+      margin-bottom: 10px;
+      color: #334155;
+    }
+
+    ul, ol {
+      margin-left: 20px;
+      margin-bottom: 12px;
+      color: #334155;
+    }
+
+    li {
+      margin-bottom: 5px;
+    }
+
+    strong {
+      color: #0F172A;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      background: #F1F5F9;
+      color: #0F172A;
+      padding: 2px 5px;
+      border-radius: 4px;
+      border: 1px solid #E2E8F0;
+    }
+
+    /* ==========================================================================
+       TABLE OF CONTENTS (INDEX) - DOWNWARD STACKED SUB-ITEMS
+       ========================================================================== */
+    .toc-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      background: #FFFFFF;
+      border: 1px solid #CBD5E1;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .toc-table th {
+      background: #1B3B33;
+      color: #FFFFFF;
+      padding: 10px 14px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      text-align: left;
+    }
+
+    .toc-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #E2E8F0;
+      font-size: 12px;
+      vertical-align: top;
+    }
+
+    .toc-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .toc-table tr:hover {
+      background: #F8FAFC;
+    }
+
+    .toc-num {
+      font-weight: 800;
+      color: #1B3B33;
+      width: 45px;
+      font-size: 13px;
+    }
+
+    .toc-title {
+      font-weight: 700;
+      color: #0F172A;
+      font-size: 13px;
+      display: inline-block;
+    }
+
+    .toc-sub-list {
+      margin-top: 5px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .toc-sub-item {
+      color: #475569;
+      font-size: 11px;
+      padding-left: 10px;
+      border-left: 2px solid #CBD5E1;
+      line-height: 1.4;
+    }
+
+    .toc-sub-item:hover {
+      color: #1B3B33;
+      border-left-color: #10B981;
+    }
+
+    .toc-page {
+      text-align: right;
+      font-weight: 700;
+      color: #2F5D50;
+      width: 80px;
+      font-size: 12px;
+    }
+
+    /* ==========================================================================
+       COMPONENT ARCHITECTURE BOXES (Section 2.1 & 2.2)
+       ========================================================================== */
+    .component-box {
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 14px;
+      border-left: 5px solid;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
+    }
+
+    .frontend-box {
+      background: #F0FDF4;
+      border: 1px solid #BBF7D0;
+      border-left: 5px solid #10B981;
+    }
+
+    .backend-box {
+      background: #F8FAFC;
+      border: 1px solid #CBD5E1;
+      border-left: 5px solid #1B3B33;
+    }
+
+    .box-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    .box-title {
+      font-size: 12.5px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .frontend-title { color: #065F46; }
+    .backend-title { color: #1B3B33; }
+
+    .box-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+
+    .frontend-badge { background: #D1FAE5; color: #065F46; }
+    .backend-badge { background: #E2E8F0; color: #1E293B; }
+
+    .box-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .box-list li {
+      display: flex;
+      margin-bottom: 5px;
+      font-size: 11.5px;
+      line-height: 1.45;
+    }
+
+    .box-list-label {
+      font-weight: 700;
+      width: 140px;
+      flex-shrink: 0;
+      color: #1E293B;
+    }
+
+    .box-list-desc {
+      color: #334155;
+    }
+
+    /* ==========================================================================
+       TECHNICAL SPECIFICATION TABLES (Page 4 Clean Tables)
+       ========================================================================== */
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 6px;
+      margin-bottom: 14px;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      overflow: hidden;
+      font-size: 11.5px;
+    }
+
+    .spec-table th {
+      background: #F1F5F9;
+      color: #1E293B;
+      padding: 7px 10px;
+      font-weight: 700;
+      text-align: left;
+      border-bottom: 1px solid #CBD5E1;
+      width: 25%;
+    }
+
+    .spec-table td {
+      padding: 7px 10px;
+      border-bottom: 1px solid #F1F5F9;
+      color: #334155;
+    }
+
+    .spec-table tr:last-child td,
+    .spec-table tr:last-child th {
+      border-bottom: none;
+    }
+
+    /* ==========================================================================
+       EXPLANATION BOX: WHY 0 TOKENS ON CACHE HIT
+       ========================================================================== */
+    .cache-explainer {
+      background: #F0FDF4;
+      border: 1px solid #86EFAC;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin: 12px 0 16px 0;
+    }
+
+    .cache-explainer-title {
+      font-size: 12.5px;
+      font-weight: 800;
+      color: #065F46;
+      margin-bottom: 6px;
+    }
+
+    .cache-comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .cache-comp-col {
+      background: #FFFFFF;
+      border: 1px solid #CBD5E1;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 11px;
+    }
+
+    .cache-comp-col h4 {
+      font-size: 11.5px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    /* ==========================================================================
+       CLEAN PERMISSIONS MATRIX TABLE (NO EMOJIS, ONLY "RESTRICTED")
+       ========================================================================== */
+    .matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      border: 1px solid #CBD5E1;
+      border-radius: 8px;
+      overflow: hidden;
+      font-size: 12px;
+    }
+
+    .matrix-table th {
+      background: #1B3B33;
+      color: #FFFFFF;
+      padding: 9px 12px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    .matrix-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #E2E8F0;
+      vertical-align: middle;
+    }
+
+    .matrix-table tr:nth-child(even) {
+      background: #F8FAFC;
+    }
+
+    .matrix-feature {
+      font-weight: 600;
+      color: #0F172A;
+      width: 38%;
+    }
+
+    .status-pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .status-allowed {
+      background: #D1FAE5;
+      color: #065F46;
+      border: 1px solid #A7F3D0;
+    }
+
+    .status-restricted {
+      background: #F1F5F9;
+      color: #64748B;
+      border: 1px solid #E2E8F0;
+    }
+
+    .status-preview {
+      background: #DBEAFE;
+      color: #1E40AF;
+      border: 1px solid #BFDBFE;
+    }
+
+    /* ==========================================================================
+       SVG FLOWCHARTS & DIAGRAMS
+       ========================================================================== */
+    .diagram-container {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 14px;
+      margin: 12px 0;
+      text-align: center;
+    }
+
+    .flow-steps {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      margin: 10px 0;
+    }
+
+    .flow-step-card {
+      background: #FFFFFF;
+      border: 1px solid #CBD5E1;
+      border-radius: 8px;
+      padding: 8px 6px;
+      flex: 1;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .flow-step-num {
+      font-size: 9.5px;
+      font-weight: 800;
+      color: #10B981;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .flow-step-name {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #0F172A;
+      line-height: 1.25;
+    }
+
+    .flow-step-desc {
+      font-size: 9.5px;
+      color: #64748B;
+      margin-top: 2px;
+    }
+
+    .flow-arrow {
+      color: #94A3B8;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    /* ==========================================================================
+       CODE BLOCKS & SYSTEM PROMPTS
+       ========================================================================== */
+    pre {
+      background: #0F172A;
+      color: #F8FAFC;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      line-height: 1.4;
+      overflow-x: auto;
+      margin: 8px 0 12px 0;
+      border: 1px solid #1E293B;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+      border: none;
+    }
+
+    .system-prompt-box {
+      background: #0F172A;
+      color: #E2E8F0;
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      line-height: 1.45;
+      border-left: 4px solid #10B981;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================================
+       PAGE 1: COVER PAGE (TITLE CENTERED, NO COMPANY NAME)
+       ======================================================================== -->
+  <div class="cover-page">
+    <div class="cover-top-accent"></div>
+
+    <div class="cover-badge">
+      Official Architecture Specification
+    </div>
+
+    <h1 class="cover-title">
+      UK Financial Rules<br>AI Compliance Assistant
+    </h1>
+
+    <p class="cover-subtitle">
+      Enterprise Retrieval-Augmented Compliance Intelligence, Multi-Tier Caching Architecture, and Floating Assistant Specification
+    </p>
+
+    <div class="cover-divider"></div>
+
+    <div class="cover-meta-grid">
+      <div class="cover-meta-card">
+        <div class="cover-meta-label">Regulatory Scope</div>
+        <div class="cover-meta-value">FCA • PRA • Bank of England</div>
+      </div>
+      <div class="cover-meta-card">
+        <div class="cover-meta-label">Primary LLM Engine</div>
+        <div class="cover-meta-value">Groq Cloud (Sub-second LPU)</div>
+      </div>
+      <div class="cover-meta-card">
+        <div class="cover-meta-label">Vector Knowledge Base</div>
+        <div class="cover-meta-value">Qdrant Vector Store</div>
+      </div>
+      <div class="cover-meta-card">
+        <div class="cover-meta-label">Document Classification</div>
+        <div class="cover-meta-value">Enterprise Internal • Confidential</div>
+      </div>
+    </div>
+
+    <div class="cover-footer">
+      UK Financial Rules AI Compliance Assistant
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       PAGE 2: MASTER TABLE OF CONTENTS (INDEX WITH DOWNWARD SUBSECTIONS)
+       ======================================================================== -->
+  <div class="page">
+    <div class="page-header">
+      <span class="page-header-title">Master Table of Contents</span>
+      <span>Executive Index</span>
+    </div>
+
+    <h1>Master Table of Contents</h1>
+    <p>This master specification details the complete engineering architecture, technology stack, token caching mechanics, role-based security model, and embeddable widget implementation for the UK Financial Rules AI Compliance Assistant.</p>
+
+    <table class="toc-table">
+      <thead>
+        <tr>
+          <th>Sec</th>
+          <th>Subject / Module Title</th>
+          <th style="text-align: right;">Page</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="toc-num">1.</td>
+          <td>
+            <span class="toc-title">Executive Summary & Problem Overview</span>
+            <div class="toc-sub-list">
+              <div class="toc-sub-item">1.1 The Business & Regulatory Challenge</div>
+              <div class="toc-sub-item">1.2 The Solution: Grounded Regulatory Intelligence</div>
+            </div>
+          </td>
+          <td class="toc-page">Page 3</td>
+        </tr>
+        <tr>
+          <td class="toc-num">2.</td>
+          <td>
+            <span class="toc-title">Technology Stack & System Integrations</span>
+            <div class="toc-sub-list">
+              <div class="toc-sub-item">2.1 Frontend Architecture Specification Box</div>
+              <div class="toc-sub-item">2.2 Backend & API Engine Specification Box</div>
+              <div class="toc-sub-item">2.3 Vector Database, Local Embeddings & Rule Chunks</div>
+              <div class="toc-sub-item">2.4 LLM Inference Engine & Document Pipeline Packages</div>
+            </div>
+          </td>
+          <td class="toc-page">Page 4</td>
+        </tr>
+        <tr>
+          <td class="toc-num">3.</td>
+          <td>
+            <span class="toc-title">High-Level System Architecture & Flow</span>
+            <div class="toc-sub-list">
+              <div class="toc-sub-item">3.1 End-to-End Architecture Diagram</div>
+              <div class="toc-sub-item">3.2 Lifecycle of a Compliance Inquiry</div>
+            </div>
+          </td>
+          <td class="toc-page">Page 5</td>
+        </tr>
+        <tr>
+          <td class="toc-num">4.</td>
+          <td>
+            <span class="toc-title">Prompt & Semantic Caching (Token & Cost Optimization)</span>
+            <div class="toc-sub-list">
+              <div class="toc-sub-item">4.1 Why Caching is Critical in Regulatory RAG</div>
+              <div class="toc-sub-item">4.2 How the Multi-Tier Cache Works (L1 to L4 Explained)</div>
+            </div>
+          </td>
+          <td class="toc-page">Page 6</td>
+        </tr>
+        <tr>
+          <td class="toc-num">5.</td>
+          <td>
+            <span class="toc-title">Role-Based Access Control (RBAC) & Feature Breakdown</span>
+            <div class="toc-sub-list">
+              <div class="toc-sub-item">5.1 User Persona 1: Anonymous / Guest Visitors</div>
+              <div class="toc-sub-item">5.2 User Persona 2: Compliance Employee (EMPLOYEE)</div>
+              <div class="toc-sub-item">5.3 User Persona 3: Compliance Administrator (ADMIN)</div>
+              <div class="toc-sub-item">5.4 Permissions Matrix</div>
+            </div>
+          </td>
+          <td class="toc-page">Page 7</td>
+        </tr>
+        <tr>
+          <td class="toc-num">6.</td>
+          <td>
+            <span class="toc-title">Embeddable Floating AI Compliance Widget</span>
+            <div class="toc-sub-list">
+              <div class="toc-sub-item">6.1 Core Concept & UX Principles</div>
+              <div class="toc-sub-item">6.2 Smart Table Suppression & Mobile Formatting</div>
+              <div class="toc-sub-item">6.3 Embedding Methods (React Drop-in vs. Iframe)</div>
+            </div>
+          </td>
+          <td class="toc-page">Page 8</td>
+        </tr>
+        <tr>
+          <td class="toc-num">7.</td>
+          <td>
+            <span class="toc-title">Production RAG System Prompt & Guardrail Instructions</span>
+            <div class="toc-sub-list">
+              <div class="toc-sub-item">7.1 The Master System Prompt</div>
+              <div class="toc-sub-item">7.2 The 7 Mandatory Compliance Guardrails</div>
+              <div class="toc-sub-item">7.3 JSON Structured Output Contract</div>
+            </div>
+          </td>
+          <td class="toc-page">Page 9</td>
+        </tr>
+        <tr>
+          <td class="toc-num">8.</td>
+          <td>
+            <span class="toc-title">AI Gatekeeper, Live Regulatory Sync & Token Governance</span>
+            <div class="toc-sub-list">
+              <div class="toc-sub-item">8.1 AI Gatekeeper (4-Point Stratified Sampling Engine)</div>
+              <div class="toc-sub-item">8.2 FCA Live Statutory Sync & Incremental Clause Diffing</div>
+              <div class="toc-sub-item">8.3 Token & Cost Governance (RAG vs. Gatekeeper Tokens)</div>
+            </div>
+          </td>
+          <td class="toc-page">Page 10</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ========================================================================
+       PAGE 3: 1. EXECUTIVE SUMMARY & PROBLEM OVERVIEW
+       ======================================================================== -->
+  <div class="page">
+    <div class="page-header">
+      <span class="page-header-title">1. Executive Summary & Problem Overview</span>
+      <span>Regulatory Grounding</span>
+    </div>
+
+    <h1>1. Executive Summary & Problem Overview</h1>
+
+    <h2>1.1 The Business & Regulatory Challenge</h2>
+    <p>Financial institutions operating in the United Kingdom face one of the world's most intricate and actively enforced regulatory environments, overseen by the <strong>Financial Conduct Authority (FCA)</strong> and the <strong>Prudential Regulation Authority (PRA)</strong>.</p>
+
+    <ul>
+      <li><strong>Volume & Complexity</strong>: The official FCA Handbook contains tens of thousands of clauses across dozens of specialized sourcebooks (<code>PRIN</code>, <code>Consumer Duty / PRIN 2A</code>, <code>CASS 7</code>, <code>SYSC 4</code>, <code>DISP 1.6</code>, <code>PROD 4</code>, <code>SUP</code>, <code>FIT</code>, <code>COBS</code>).</li>
+      <li><strong>Severe Non-Compliance Penalties</strong>: Breaching statutory provisions (such as client money segregation under CASS 7 or complaint timeframes under DISP 1.6) exposes firms to multimillion-pound fines, public censure, and loss of regulatory permissions.</li>
+      <li><strong>Hallucination Risk of Public LLMs</strong>: Standard generic commercial AI models (such as vanilla ChatGPT) frequently hallucinate regulatory clauses, confuse US rules (SEC/FINRA) with UK rules (FCA/PRA), or cite outdated provisions.</li>
+      <li><strong>Cost & Latency Bottlenecks</strong>: Full RAG prompts with regulatory text consume 1,500 to 3,500 tokens per inquiry, leading to substantial recurring API costs and 15–20 second response times.</li>
+    </ul>
+
+    <h2>1.2 The Solution: Grounded Regulatory Intelligence</h2>
+    <p>The <strong>UK Financial Rules AI Compliance Assistant</strong> is an enterprise-grade, retrieval-augmented intelligence system designed to solve these challenges:</p>
+
+    <ol>
+      <li><strong>100% Grounded in Official Corpus</strong>: Every answer is synthesized exclusively from official regulatory PDFs/DOCXs uploaded and indexed into the firm's vector database.</li>
+      <li><strong>Multi-Sourcebook Cross-Synthesis</strong>: Automatically synthesizes cross-cutting rules when an inquiry touches multiple regimes (e.g. <code>PROD 4</code> Product Governance + <code>PRIN 2A</code> Consumer Duty).</li>
+      <li><strong>Multi-Tier Caching</strong>: Cuts API token costs and reduces query latency from 18 seconds to 18 milliseconds on repeated and semantically similar queries.</li>
+      <li><strong>Omnichannel Access</strong>: Operates as a full desktop compliance portal (<code>/chat</code>) and as an isolated, embeddable floating widget (<code>/widget</code>, <code>/test</code>) that can be dropped into any banking intranet or customer portal.</li>
+    </ol>
+  </div>
+
+  <!-- ========================================================================
+       PAGE 4: 2. TECHNOLOGY STACK & SYSTEM INTEGRATIONS (CLEAN SPECIFICATIONS)
+       ======================================================================== -->
+  <div class="page">
+    <div class="page-header">
+      <span class="page-header-title">2. Technology Stack & Integrations</span>
+      <span>Frontend & Backend Boxes</span>
+    </div>
+
+    <h1>2. Technology Stack & System Integrations</h1>
+
+    <!-- BOX 1: FRONTEND ARCHITECTURE -->
+    <div class="component-box frontend-box">
+      <div class="box-header">
+        <span class="box-title frontend-title">2.1 Frontend Architecture Specification</span>
+        <span class="box-badge frontend-badge">Client Tier • Port 8080</span>
+      </div>
+      <ul class="box-list">
+        <li>
+          <span class="box-list-label">Core Framework:</span>
+          <span class="box-list-desc">React 18.3 + Vite 5 (fast hot module reloading, code-splitting & tree-shaking)</span>
+        </li>
+        <li>
+          <span class="box-list-label">Component Library:</span>
+          <span class="box-list-desc">Chakra UI v2.8 (theme-driven, accessible design with dark/light compliance palettes)</span>
+        </li>
+        <li>
+          <span class="box-list-label">Iconography:</span>
+          <span class="box-list-desc">Lucide React (modern, lightweight SVG icons)</span>
+        </li>
+        <li>
+          <span class="box-list-label">Markdown Engine:</span>
+          <span class="box-list-desc">react-markdown v9 + remark-gfm v4 (parses AI responses, bullet points & citations)</span>
+        </li>
+        <li>
+          <span class="box-list-label">Routing & Guards:</span>
+          <span class="box-list-desc">React Router DOM v6.23 (protected routes, role guards, standalone widget simulator)</span>
+        </li>
+        <li>
+          <span class="box-list-label">HTTP Client:</span>
+          <span class="box-list-desc">Axios with automatic request/response interceptors for unwrapping API data</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- BOX 2: BACKEND & API ENGINE -->
+    <div class="component-box backend-box">
+      <div class="box-header">
+        <span class="box-title backend-title">2.2 Backend & API Engine Specification</span>
+        <span class="box-badge backend-badge">Server Tier • Port 5000</span>
+      </div>
+      <ul class="box-list">
+        <li>
+          <span class="box-list-label">Runtime Platform:</span>
+          <span class="box-list-desc">Node.js v18+ running native ECMAScript Modules (<code>"type": "module"</code>)</span>
+        </li>
+        <li>
+          <span class="box-list-label">Web Framework:</span>
+          <span class="box-list-desc">Express v5.2 (lightweight, asynchronous REST request pipeline)</span>
+        </li>
+        <li>
+          <span class="box-list-label">Primary Database:</span>
+          <span class="box-list-desc">MongoDB with Mongoose v9.9 ODM (persists users, multi-turn chats & query audits)</span>
+        </li>
+        <li>
+          <span class="box-list-label">Security & Auth:</span>
+          <span class="box-list-desc">JSON Web Tokens (JWT) + bcryptjs salted password hashing + helmet + rate-limiting</span>
+        </li>
+        <li>
+          <span class="box-list-label">Schema Validation:</span>
+          <span class="box-list-desc">Zod v4 for strict runtime payload validation on all auth and query endpoints</span>
+        </li>
+        <li>
+          <span class="box-list-label">CORS Pipeline:</span>
+          <span class="box-list-desc">cors v2.8 (configured to allow secure cross-origin embedding for the floating widget)</span>
+        </li>
+      </ul>
+    </div>
+
+    <h2>2.3 Vector Database, Local Embeddings & Rule Chunks</h2>
+    <table class="spec-table">
+      <tr>
+        <th>Vector Database</th>
+        <td><strong>Qdrant Vector Engine</strong> running on port 6333 in Docker. Manages <code>regulatory_rules</code> (auto-indexed rule passages) and <code>semantic_cache</code> (query vectors) with Cosine distance metric.</td>
+      </tr>
+      <tr>
+        <th>Local Embeddings Model</th>
+        <td><strong>Xenova/bge-small-en-v1.5</strong> executed locally via <code>@huggingface/transformers</code>. Generates fast 384-dimensional dense vectors with zero external embedding API fees or network lag.</td>
+      </tr>
+      <tr>
+        <th>Regulatory Rule Chunks</th>
+        <td>Official UK regulatory handbooks (thousands of pages) are automatically parsed and sliced into cohesive semantic sections (~500–800 chars each) tagged with authority (FCA/PRA), sourcebook, and exact rule codes. Automatically scales as new documents are ingested.</td>
+      </tr>
+    </table>
+
+    <h2>2.4 LLM Inference Engine & Document Pipeline Packages</h2>
+    <table class="spec-table">
+      <tr>
+        <th>LLM Inference Engine</th>
+        <td><strong>Groq Cloud API</strong> (<code>groq-sdk</code> v1.6) executing <code>openai/gpt-oss-120b</code> / Llama-3-70B. Powered by specialized <strong>LPU (Language Processing Unit)</strong> hardware delivering sub-second response times (&lt;1000ms) with temperature set to 0.1 for strict compliance grounding.</td>
+      </tr>
+      <tr>
+        <th>Document Parsers</th>
+        <td><code>pdf-parse</code> (extracts text, sections & statutory headings from official FCA PDFs) and <code>mammoth</code> (extracts raw text from Word <code>.docx</code> compliance manuals).</td>
+      </tr>
+      <tr>
+        <th>Text Chunking Engine</th>
+        <td><code>@langchain/textsplitters</code> (implements recursive character text splitting preserving regulatory section hierarchies).</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ========================================================================
+       PAGE 5: 3. HIGH-LEVEL ARCHITECTURE & LIFECYCLE
+       ======================================================================== -->
+  <div class="page">
+    <div class="page-header">
+      <span class="page-header-title">3. Architecture & Lifecycle</span>
+      <span>End-to-End System Flow</span>
+    </div>
+
+    <h1>3. High-Level System Architecture & Flow</h1>
+
+    <div class="diagram-container">
+      <div style="font-weight: 700; font-size: 12px; color: #1B3B33; margin-bottom: 12px;">
+        COMPLIANCE INQUIRY LIFECYCLE & HYBRID RAG PIPELINE
+      </div>
+
+      <div class="flow-steps">
+        <div class="flow-step-card">
+          <div class="flow-step-num">Step 1</div>
+          <div class="flow-step-name">User Query</div>
+          <div class="flow-step-desc">Desktop / Widget</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step-card">
+          <div class="flow-step-num">Step 2</div>
+          <div class="flow-step-name">Contextualize</div>
+          <div class="flow-step-desc">Pronoun resolution</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step-card" style="border-color: #10B981; background: #F0FDF4;">
+          <div class="flow-step-num" style="color: #059669;">Step 3</div>
+          <div class="flow-step-name">Multi-Tier Cache</div>
+          <div class="flow-step-desc">L1 RAM / L2 / L3 Qdrant</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step-card">
+          <div class="flow-step-num">Step 4</div>
+          <div class="flow-step-name">Qdrant Vector</div>
+          <div class="flow-step-desc">Top 4 rule chunks</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step-card" style="border-color: #6366F1; background: #EEF2FF;">
+          <div class="flow-step-num" style="color: #4F46E5;">Step 5</div>
+          <div class="flow-step-name">Groq LLM</div>
+          <div class="flow-step-desc">Sub-second JSON</div>
+        </div>
+      </div>
+    </div>
+
+    <h2>3.2 Lifecycle of a Compliance Inquiry</h2>
+    <ol>
+      <li><strong>User Submits Question</strong>: The user submits an inquiry via the main chat interface or floating widget (e.g. <em>"What are the complaint time limits under FCA DISP?"</em>).</li>
+      <li><strong>Pronoun & Context Resolution</strong>: If the question contains pronouns (<em>"What must they send to them if it is not resolved?"</em>), the backend resolves references against prior turns.</li>
+      <li><strong>Multi-Tier Cache Inspection</strong>: Checked against L1 RAM, L2 MongoDB, and L3 Qdrant Semantic Vector Cache. If a match is found (&ge;80% similarity), the response returns in <strong>18ms with 0 tokens consumed</strong>.</li>
+      <li><strong>Vector Search (Cache Miss)</strong>: Local BGE embeddings convert the query into a 384-dimensional vector, retrieving the top 4 most relevant clauses from Qdrant.</li>
+      <li><strong>Guardrail Validation</strong>: Out-of-scope inquiries (cooking, sports, general coding) trigger a strict refusal with <code>NOT_FOUND</code> confidence.</li>
+      <li><strong>LLM Synthesis</strong>: Groq LLM synthesizes the answer, citing exact rule codes (e.g. <code>DISP 1.6.2 R</code>).</li>
+      <li><strong>Adaptive Formatting</strong>: If <code>isWidget: true</code>, the answer is converted into 3–5 compact bullets; if normal chat, full comparison tables are rendered.</li>
+      <li><strong>Persistence & Ingestion</strong>: The turn is saved to MongoDB and indexed into the semantic cache for future instant hits.</li>
+    </ol>
+  </div>
+
+  <!-- ========================================================================
+       PAGE 6: 4. PROMPT & SEMANTIC CACHING
+       ======================================================================== -->
+  <div class="page">
+    <div class="page-header">
+      <span class="page-header-title">4. Prompt & Semantic Caching</span>
+      <span>Token & Cost Economics</span>
+    </div>
+
+    <h1>4. Prompt & Semantic Caching (Token & Cost Optimization)</h1>
+
+    <h2>4.1 Why Caching is Critical in Regulatory RAG</h2>
+    <p>In an enterprise financial firm, employees and clients frequently ask identical or slightly rephrased compliance questions. Without caching, every single inquiry sends ~1,500–2,500 prompt tokens to the LLM. Multi-tier caching intercepts these queries, dropping input tokens to <strong>zero</strong> and latency from 18 seconds to 18 milliseconds.</p>
+
+    <h2>4.2 How the Multi-Tier Cache Works (All Levels Explained)</h2>
+
+    <table class="matrix-table" style="margin-bottom: 16px;">
+      <thead>
+        <tr>
+          <th>Cache Level</th>
+          <th>Technology</th>
+          <th>Matching Mechanism</th>
+          <th>Latency</th>
+          <th>Token Cost</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Level 1 (L1)</strong></td>
+          <td>Node.js In-Memory Map</td>
+          <td>Exact normalized query hash in RAM</td>
+          <td>&lt; 1 ms</td>
+          <td><span class="status-pill status-allowed">0 Tokens</span></td>
+        </tr>
+        <tr>
+          <td><strong>Level 2 (L2)</strong></td>
+          <td>MongoDB <code>promptcaches</code></td>
+          <td>Exact normalized query hash in DB (survives restarts)</td>
+          <td>&lt; 5 ms</td>
+          <td><span class="status-pill status-allowed">0 Tokens</span></td>
+        </tr>
+        <tr>
+          <td><strong>Level 3 (L3)</strong></td>
+          <td>Qdrant Semantic Cache</td>
+          <td><strong>Vector similarity &ge; 80%</strong> (paraphrased questions)</td>
+          <td>~18 ms</td>
+          <td><span class="status-pill status-allowed">0 Tokens</span></td>
+        </tr>
+        <tr>
+          <td><strong>Level 4 (L4)</strong></td>
+          <td>MongoDB <code>queryhistories</code></td>
+          <td>Regex fallback pattern matching against past audits</td>
+          <td>&lt; 20 ms</td>
+          <td><span class="status-pill status-allowed">0 Tokens</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ========================================================================
+       PAGE 7: 5. ROLE-BASED ACCESS CONTROL (RBAC) & PERMISSIONS MATRIX
+       ======================================================================== -->
+  <div class="page">
+    <div class="page-header">
+      <span class="page-header-title">5. Role-Based Access Control</span>
+      <span>Permissions Matrix</span>
+    </div>
+
+    <h1>5. Role-Based Access Control (RBAC) & Feature Breakdown</h1>
+
+    <p>The platform enforces strict role-based access control across all frontend views and backend REST endpoints.</p>
+
+    <ul>
+      <li><strong>Anonymous / Guest Visitors</strong>: Can open and chat with the floating widget on <code>/widget</code> and external sites (<code>/test</code>). Allowed 2 preview questions in <code>/chat</code> before login is required.</li>
+      <li><strong>Compliance Employee (<code>EMPLOYEE</code>)</strong>: Unlimited interactive compliance chat, multi-turn pronoun memory, verified rule citations with confidence scores, personal chat history management. Blocked from administrative controls.</li>
+      <li><strong>Compliance Administrator (<code>ADMIN</code>)</strong>: Everything an employee can do, plus regulatory document ingestion (PDF/DOCX), Qdrant rules library management, team management (provisioning users, promoting/demoting roles), and token & cost analytics.</li>
+    </ul>
+
+    <h2>5.4 Permissions Matrix</h2>
+
+    <table class="matrix-table">
+      <thead>
+        <tr>
+          <th>Feature / Functional Capability</th>
+          <th>Anonymous / Guest</th>
+          <th>Compliance Employee</th>
+          <th>Administrator</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="matrix-feature">Floating Widget Chat (<code>/widget</code>, <code>/test</code>)</td>
+          <td><span class="status-pill status-allowed">Allowed</span></td>
+          <td><span class="status-pill status-allowed">Allowed</span></td>
+          <td><span class="status-pill status-allowed">Allowed</span></td>
+        </tr>
+        <tr>
+          <td class="matrix-feature">Full Compliance Assistant Chat (<code>/chat</code>)</td>
+          <td><span class="status-pill status-preview">2 Previews</span></td>
+          <td><span class="status-pill status-allowed">Allowed</span></td>
+          <td><span class="status-pill status-allowed">Allowed</span></td>
+        </tr>
+        <tr>
+          <td class="matrix-feature">Personal Chat History Management</td>
+          <td><span class="status-pill status-restricted">Not Available</span></td>
+          <td><span class="status-pill status-allowed">Access Own History</span></td>
+          <td><span class="status-pill status-allowed">Access Own History</span></td>
+        </tr>
+        <tr>
+          <td class="matrix-feature">Regulatory Document Upload & Ingestion</td>
+          <td><span class="status-pill status-restricted">Restricted</span></td>
+          <td><span class="status-pill status-restricted">Restricted</span></td>
+          <td><span class="status-pill status-allowed">Allowed</span></td>
+        </tr>
+        <tr>
+          <td class="matrix-feature">Regulatory Rules Library Management</td>
+          <td><span class="status-pill status-restricted">Restricted</span></td>
+          <td><span class="status-pill status-restricted">Restricted</span></td>
+          <td><span class="status-pill status-allowed">Allowed</span></td>
+        </tr>
+        <tr>
+          <td class="matrix-feature">User Management & Role Elevation</td>
+          <td><span class="status-pill status-restricted">Restricted</span></td>
+          <td><span class="status-pill status-restricted">Restricted</span></td>
+          <td><span class="status-pill status-allowed">Allowed</span></td>
+        </tr>
+        <tr>
+          <td class="matrix-feature">Token & Cost Analytics Dashboard</td>
+          <td><span class="status-pill status-restricted">Restricted</span></td>
+          <td><span class="status-pill status-restricted">Restricted</span></td>
+          <td><span class="status-pill status-allowed">Allowed</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ========================================================================
+       PAGE 8: 6. EMBEDDABLE FLOATING AI COMPLIANCE WIDGET
+       ======================================================================== -->
+  <div class="page">
+    <div class="page-header">
+      <span class="page-header-title">6. Embeddable Floating Widget</span>
+      <span>Omnichannel Integration</span>
+    </div>
+
+    <h1>6. Embeddable Floating AI Compliance Widget</h1>
+
+    <h2>6.1 Core Concept & UX Principles</h2>
+    <p>The <strong>Compliance Widget</strong> (<code>ComplianceWidget.jsx</code>) allows any external banking portal, intranet, or client website to embed the AI compliance assistant seamlessly:</p>
+
+    <ul>
+      <li><strong>Fixed Corner Launcher</strong>: Pinned to bottom-right corner (<code>position: fixed; bottom: 24px; right: 24px; z-index: 9999</code>).</li>
+      <li><strong>Page Backdrop Dimming</strong>: A blurred backdrop overlay (<code>rgba(12, 22, 20, 0.58)</code> + <code>backdropFilter: blur(3.5px)</code>) dims the host website, focusing attention on compliance advice.</li>
+      <li><strong>Background Scroll Lock</strong>: Disables host page scrolling (<code>document.body.style.overflow = 'hidden'</code>) while open so wheel scrolling stays inside the chat card.</li>
+    </ul>
+
+    <h2>6.2 Smart Table Suppression & Mobile Formatting</h2>
+    <p>Standard desktop chat generates wide, 4-column Markdown comparison tables. Inside a 380px floating popup, wide tables cause horizontal overflow. The backend automatically detects <code>isWidget: true</code> and converts wide tables into <strong>3 to 5 concise bullet points</strong> with bold inline rule codes. If the user explicitly asks for a table (<em>"Show me a comparison table..."</em>), the widget honors the request and renders a structured Markdown table.</p>
+
+    <h2>6.3 Embedding Methods</h2>
+
+    <h3>Method A: React Drop-in Component (Inside React Apps)</h3>
+    <pre><code>import { ComplianceWidget } from './components/widget/ComplianceWidget.jsx';
+
+export default function BankingPortal() {
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;Internal Banking Portal&lt;/h1&gt;
+      &lt;ComplianceWidget mode="floating" defaultOpen={false} /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+    <h3>Method B: Isolated Iframe Embed (WordPress, HTML, External Websites)</h3>
+    <pre><code>&lt;iframe
+  src="http://localhost:8080/widget?embed=true"
+  width="400"
+  height="600"
+  style="position:fixed; bottom:20px; right:20px; border:none; z-index:99999; border-radius:20px; box-shadow:0 20px 50px rgba(0,0,0,0.25);"
+  title="AI Compliance Assistant"
+&gt;&lt;/iframe&gt;</code></pre>
+  </div>
+
+  <!-- ========================================================================
+       PAGE 9: 7. PRODUCTION RAG SYSTEM PROMPT & GUARDRAILS
+       ======================================================================== -->
+  <div class="page">
+    <div class="page-header">
+      <span class="page-header-title">7. Production RAG System Prompt</span>
+      <span>Guardrail Contract</span>
+    </div>
+
+    <h1>7. Production RAG System Prompt & Guardrail Instructions</h1>
+
+    <p>The intelligence and safety of the system are governed by the static compliance instructions compiled into every Groq LLM completion call in <code>backend/src/services/ragAgent.service.js</code>:</p>
+
+    <div class="system-prompt-box">You are the UK Financial Rules AI Compliance Assistant.
+Your mission is to provide accurate, authoritative answers about UK financial regulations (FCA, PRA, Bank of England).
+
+STRICT COMPLIANCE RULES:
+1. Base your answer EXCLUSIVELY on the provided UK financial rules from the knowledge base.
+2. If the question is completely unrelated to UK financial regulations (e.g. cooking recipes, sports, foreign non-UK law) or none of the provided sources relate to the inquiry, state: "The uploaded regulatory documents in the knowledge base do not contain information or provisions to answer this question. Please upload the relevant official FCA/PRA sourcebook." and set confidence to "NOT_FOUND".
+3. When a question combines two or more regulatory concepts or sourcebooks (e.g. PROD + DISP, FCG + SUP, CASS + SYSC), synthesize a unified compliance analysis integrating the provisions provided across the sources and cite each sourcebook's exact rule codes.
+4. Quote the exact authority (FCA, PRA), rule codes (e.g. PROD 4, DISP 1.1A, CASS 5.5, SUP 15.3), and document titles.
+5. Follow-Up Questions Rule: Only suggest 2 follow-up compliance questions IF they directly ask about specific clauses, sub-paragraphs, or rule codes explicitly present in the provided RELEVANT UK FINANCIAL RULES above. Never suggest questions about unprovided chapters, external guidelines, or speculative topics. If confidence is "NOT_FOUND", output "suggestedFollowUps": [].
+6. Formatting Rule:
+   - For Normal Chat: When comparing rules or displaying multiple requirements, present the key distinctions in a clean Markdown table.
+   - For Widget: Keep your answer concise, precise, and relatively small (3 to 5 short bullet points, ~90–150 words total). Cite exact FCA/PRA rule codes inline in bold (e.g., **DISP 1.6.2 R**). DO NOT output any Markdown tables unless the user explicitly asked for a table.
+7. Multi-Turn Conversational Memory: When the user's question contains pronouns or relative references (such as "they", "them", "their", "it", "its", "this rule", "that requirement"), resolve them directly against the prior conversation turns in the thread.
+
+Respond strictly in JSON:
+{
+  "answer": "&lt;Structured markdown answer strictly citing the provided rules&gt;",
+  "confidence": "HIGH" | "MEDIUM" | "LOW" | "NOT_FOUND",
+  "suggestedFollowUps": [
+    "&lt;Real regulatory follow-up question 1&gt;",
+    "&lt;Real regulatory follow-up question 2&gt;"
+  ]
+}</div>
+
+    <h2>7.2 The 7 Mandatory Compliance Guardrails</h2>
+    <ol>
+      <li><strong>Corpus Grounding</strong>: Prohibits generic AI speculation; answers must originate from the vector database.</li>
+      <li><strong>Out-of-Scope Refusal</strong>: Questions on non-compliance topics (sports, cooking, general coding) are refused with <code>NOT_FOUND</code> confidence.</li>
+      <li><strong>Cross-Sourcebook Synthesis</strong>: Synthesizes multiple regulatory regimes when a question bridges multiple topics (e.g., Consumer Duty + Dispute Resolution).</li>
+      <li><strong>Statutory Citations</strong>: Requires explicit citation of rule codes (<code>PRIN 2A.2.27 R</code>, <code>CASS 7.15</code>, <code>SYSC 4.1.1 R</code>).</li>
+      <li><strong>Grounded Follow-Ups</strong>: Prohibits speculative suggested follow-ups; questions must reflect actual indexed clauses.</li>
+      <li><strong>Adaptive Layout (Widget vs. Chat)</strong>: Formats concise bullet points for 380px widgets and comprehensive tables for full-screen dashboards.</li>
+      <li><strong>Pronoun & Anaphora Memory</strong>: Resolves relative references across conversational turns while preserving context.</li>
+    </ol>
+
+    <h2>7.3 JSON Structured Output Contract</h2>
+    <p style="font-size: 11.5px; color: #334155; margin-top: 4px;">By enforcing a strict JSON schema contract at temperature <code>0.1</code>, the backend guarantees deterministic parsing, reliable citation badges, real-time follow-up chips, and predictable UI rendering across all client applications.</p>
+  </div>
+
+  <!-- ========================================================================
+       PAGE 10: 8. AI GATEKEEPER, LIVE REGULATORY SYNC & TOKEN GOVERNANCE
+       ======================================================================== -->
+  <div class="page">
+    <div class="page-header">
+      <span class="page-header-title">8. Gatekeeper, Live Sync & Governance</span>
+      <span>Authenticity & Real-Time Intelligence</span>
+    </div>
+
+    <h1>8. AI Gatekeeper, Live Regulatory Sync & Token Governance</h1>
+
+    <h2>8.1 AI Gatekeeper (4-Point Stratified Sampling Engine)</h2>
+    <p>Before any uploaded PDF or Word <code>.docx</code> rulebook is sliced and embedded into the Qdrant vector database, it must pass through the automated <strong>AI Gatekeeper</strong> (<code>aiGatekeeper.service.js</code>) to prevent vector space contamination:</p>
+
+    <div class="component-box" style="background: #F8FAFC; border: 1px solid #CBD5E1; border-left: 5px solid #6366F1; margin-bottom: 10px;">
+      <div class="box-header">
+        <span class="box-title" style="color: #4338CA;">4-Checkpoint Stratified Sampling Architecture</span>
+        <span class="box-badge" style="background: #EEF2FF; color: #4338CA;">Fixed Economy • ~1,250 Tokens</span>
+      </div>
+      <table class="spec-table" style="font-size: 11px;">
+        <tr>
+          <th style="width: 32%;">Checkpoint 1 (0% / Start)</th>
+          <td>Document Cover, Title & Statutory Publication Notice (<strong>1,200 chars</strong>).</td>
+        </tr>
+        <tr>
+          <th>Checkpoint 2 (~15% Mark)</th>
+          <td>Application Scope, General Definitions & Applicable Firm Categories (<strong>800 chars</strong>).</td>
+        </tr>
+        <tr>
+          <th>Checkpoint 3 (~50% Mark)</th>
+          <td>Core Substantive Regulatory Standards & Operational Requirements (<strong>800 chars</strong>).</td>
+        </tr>
+        <tr>
+          <th>Checkpoint 4 (~85% Mark)</th>
+          <td>Transitional Provisions, Enforcement Schedules & Regulatory Powers (<strong>800 chars</strong>).</td>
+        </tr>
+      </table>
+    </div>
+
+    <p style="margin-bottom: 12px;"><strong>Fixed Token Cost</strong>: Slicing exactly <strong>3,600 characters</strong> across 4 mathematical points guarantees that verification consumes only <strong>~1,200–1,355 Groq tokens</strong>, whether verifying a 15-page notice or a 1,000-page handbook. If invalid (e.g. general recipes, resumes, US SEC rules), the upload is rejected immediately before indexing.</p>
+
+    <h2>8.2 FCA Live Statutory Sync & Incremental Clause Diffing</h2>
+    <p>UK regulations undergo continuous statutory revision. The system incorporates real-time regulatory synchronization:</p>
+
+    <ul>
+      <li><strong>Free & Public Official FCA Feed</strong>: The UK Financial Conduct Authority operates under UK Open Government transparency requirements and provides an <strong>official, public RSS feed</strong> (<code>https://www.fca.org.uk/news/rss.xml</code>). This publication feed is <strong>100% free and open to the public</strong> without requiring paid API keys, vendor subscriptions, or authentication tokens.</li>
+      <li><strong>Automated Ingestion (<code>fcaSync.service.js</code>)</strong>: The backend polls this free public feed with a 15-minute in-memory cache to ingest breaking Handbook Notices, Policy Statements, and consultation papers.</li>
+      <li><strong>MD5 Incremental Clause Diffing (<code>applyIncrementalRuleDiff</code>)</strong>: When a handbook amendment is detected, the engine does not re-embed the entire 500-page document. It computes MD5 hashes of individual statutory clauses, identifies only modified or new paragraphs, and updates only those specific vectors in Qdrant—saving 95% of embedding CPU compute.</li>
+    </ul>
+
+    <h2>8.3 Token & Cost Governance: Document RAG vs. Gatekeeper Tokens</h2>
+    <p>In the administrative ledger (<code>/admin/cost-analysis</code>), two token metrics are tracked separately:</p>
+    <ul>
+      <li><strong>Document RAG Volume</strong>: The complete text volume of rulebooks (e.g. 631,065 tokens for <code>SUP.pdf</code>) chunked and embedded <strong>100% locally on server CPU</strong> via <code>bge-small-en-v1.5</code> into Qdrant (<strong>0 Groq tokens billed</strong>).</li>
+      <li><strong>AI Gatekeeper Tokens</strong>: The one-time, fixed security check (~1,250 tokens billed to Groq) that authenticates the document before indexing.</li>
+    </ul>
+  </div>
+
+</body>
+</html>
