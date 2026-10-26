@@ -26,6 +26,7 @@ export const askAgent = asyncHandler(async (req, res) => {
 
   const trimmedQuestion = question.trim();
   const userId = req.user?._id || req.user?.id || null;
+  //checks whether the request came from your embedded widget
   const cleanWidgetSessionId = typeof widgetSessionId === 'string' && widgetSessionId.trim().length >= 6
     ? widgetSessionId.trim()
     : null;
@@ -34,7 +35,7 @@ export const askAgent = asyncHandler(async (req, res) => {
   let conversation = null;
   let historyForMemory = [];
 
-  if ((userId || cleanWidgetSessionId) && mongoose.connection.readyState === 1) {
+  if ((userId || cleanWidgetSessionId) && mongoose.connection.readyState === 1) {//MongoDB is connected.
     try {
       if (cleanWidgetSessionId) {
         conversation = await Conversation.findOne({ widgetSessionId: cleanWidgetSessionId, isArchived: false });
@@ -87,10 +88,10 @@ export const askAgent = asyncHandler(async (req, res) => {
       conversation.messages.push({
         role: 'assistant',
         content: result.answer,
-        confidence: result.confidence || 'HIGH',
+        confidence: result.confidence || '',
         citedRules: result.citedRules || [],
         suggestedFollowUps: result.suggestedFollowUps || [],
-        model: result.model || 'openai/gpt-oss-120b',
+        model: result.model || '',
         promptTokens: result.tokens?.prompt || 0,
         completionTokens: result.tokens?.completion || 0,
         totalTokens: result.tokens?.total || 0,
@@ -429,13 +430,13 @@ export const getCostAnalysis = asyncHandler(async (req, res) => {
     purposeMap[purp].totalTokens += tTok;
   }
 
-  // Include in-memory prompt cache metrics if higher (e.g. active process hits)
-  const inMemoryCacheStats = promptCache.getMetrics();
-  if (inMemoryCacheStats.tokensSaved > totalTokensSaved) {
-    totalTokensSaved = inMemoryCacheStats.tokensSaved;
+  // Include persistent prompt cache metrics if higher (recorded hits or token savings)
+  const promptCacheStats = promptCache.getMetrics();
+  if (promptCacheStats.tokensSaved > totalTokensSaved) {
+    totalTokensSaved = promptCacheStats.tokensSaved;
   }
-  if (inMemoryCacheStats.hits > totalCachedQueries) {
-    totalCachedQueries = inMemoryCacheStats.hits;
+  if (promptCacheStats.hits > totalCachedQueries) {
+    totalCachedQueries = promptCacheStats.hits;
   }
 
   const modelBreakdown = Object.values(modelMap).sort((a, b) => b.totalTokens - a.totalTokens);

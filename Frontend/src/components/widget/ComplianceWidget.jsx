@@ -10,7 +10,6 @@ import {
   Button,
   Badge,
   Spinner,
-  Collapse,
   Tooltip,
 } from '@chakra-ui/react';
 import {
@@ -18,9 +17,7 @@ import {
   MessageSquare,
   X,
   RotateCcw,
-  ShieldCheck,
-  ChevronDown,
-  ChevronUp,
+  ShieldCheck,  
   Sparkles,
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';

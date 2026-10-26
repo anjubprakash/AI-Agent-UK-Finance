@@ -6,29 +6,23 @@ import { getEmbeddingModel } from './aiProvider.service.js';
 import { searchSemanticCache, upsertSemanticCachePoint } from './qdrant.service.js';
 
 /**
- * Enterprise Consolidated Multi-Tier Prompt & Semantic Cache Service
+ * Enterprise Consolidated Persistent & Semantic Cache Service
  * 
- * Consolidated Architecture:
- * 1. L1 Fast In-Memory RAM Cache:
- *    Instant <1ms response from Node.js memory using normalized query hashing.
+ * Architecture (Zero-RAM Overhead):
+ * 1. Persistent MongoDB Cache:
+ *    Durable cross-user storage across server reboots. Instant lookup using normalized query and SHA-256 hash. Zero RAM overhead.
  * 
- * 2. L2 Persistent MongoDB Cache:
- *    Durable cross-user storage across server reboots and container recycles.
- * 
- * 3. L3 Qdrant Semantic Vector Cache:
- *    Uses 384-dimensional dense vectors (Cosine distance, >=0.88 similarity threshold).
+ * 2. Qdrant Semantic Vector Cache:
+ *    Uses 384-dimensional dense vectors (Cosine distance, >=0.80 similarity threshold).
  *    Matches paraphrased questions (e.g. "What are the 12 Principles?" vs "List the 12 FCA principles").
- *    Eliminates BOTH input prompt tokens and output completion tokens (<25ms).
+ *    Zero Node.js heap/RAM storage!
  * 
- * 4. L4 Retroactive QueryHistory Matcher:
+ * 3. Retroactive QueryHistory Matcher:
  *    Fallback pattern matching against past historical queries in MongoDB.
  */
 
 class PromptCacheService {
   constructor(options = {}) {
-    this.cache = new Map();
-    this.maxEntries = options.maxEntries || 2000;
-    this.defaultTtlMs = options.defaultTtlMs || 24 * 60 * 60 * 1000; // 24 hours in RAM
     this.similarityThreshold = options.similarityThreshold || 0.80; // 80% cosine similarity threshold for paraphrased queries
     this.stats = {
       hits: 0,
@@ -71,40 +65,14 @@ class PromptCacheService {
 
   /**
    * Retrieve cached prompt completion across:
-   * L1 (RAM) -> L2 (MongoDB PromptCache) -> L3 (Qdrant Semantic Cache) -> L4 (QueryHistory)
+   * 1. Persistent MongoDB Cache -> 2. Qdrant Semantic Vector Cache -> 3. Fallback QueryHistory in MongoDB
+   * (Zero RAM memory used)
    */
   async get(key, query, model, customThreshold = null) {
     const effectiveKey = key || this.generateKey(model, query);
     const normQ = this.normalizeQuery(query);
-    const now = Date.now();
 
-    // 1. Check L1 Memory Cache (Exact Normalized Match: <1ms)
-    if (effectiveKey && this.cache.has(effectiveKey)) {
-      const entry = this.cache.get(effectiveKey);
-      const isRefusal = entry.data?.confidence === 'NOT_FOUND' || 
-                        (entry.data?.answer && entry.data.answer.toLowerCase().includes('strict refusal'));
-      if (isRefusal) {
-        this.cache.delete(effectiveKey);
-      } else if (now <= entry.expiresAt) {
-        this.cache.delete(effectiveKey);
-        this.cache.set(effectiveKey, entry); // refresh LRU position
-        this.stats.hits += 1;
-        const saved = entry.tokens?.cachedTokens || entry.tokens?.totalTokens || (entry.tokens?.promptTokens + entry.tokens?.completionTokens) || 2293;
-        this.stats.tokensSaved += saved;
-        return {
-          ...entry.data,
-          isCached: true,
-          cacheType: 'EXACT',
-          tokensSaved: saved,
-          cachedAt: entry.createdAt,
-          originalTokens: entry.tokens
-        };
-      } else {
-        this.cache.delete(effectiveKey);
-      }
-    }
-
-    // 2. Check L2 Persistent MongoDB Cache (Exact Normalized Match: <5ms)
+    // 1. Check Persistent MongoDB Cache (Exact Normalized Match: <5ms, Zero RAM)
     if (mongoose.connection.readyState === 1) {
       try {
         const dbCached = await PromptCache.findOne({
@@ -122,25 +90,7 @@ class PromptCacheService {
           const totalToks = dbCached.totalTokens || (promptToks + complToks) || 2293;
           const tokensSaved = dbCached.cachedTokens || totalToks || 2293;
 
-          // Promote to L1 Memory Cache for subsequent instant hits
-          this.cache.set(effectiveKey, {
-            data: {
-              answer: dbCached.answer,
-              confidence: dbCached.confidence || 'HIGH',
-              suggestedFollowUps: dbCached.suggestedFollowUps || [],
-              citedRules: dbCached.citedRules || []
-            },
-            tokens: {
-              promptTokens: promptToks,
-              completionTokens: complToks,
-              totalTokens: totalToks,
-              cachedTokens: tokensSaved
-            },
-            createdAt: dbCached.createdAt || new Date().toISOString(),
-            expiresAt: now + this.defaultTtlMs
-          });
-
-          // Asynchronously increment hit counter
+          // Asynchronously increment hit counter in MongoDB
           PromptCache.updateOne({ _id: dbCached._id }, { $inc: { hitCount: 1 } }).catch(() => {});
 
           this.stats.hits += 1;
@@ -164,11 +114,11 @@ class PromptCacheService {
           };
         }
       } catch (dbErr) {
-        console.warn('⚠️ L2 Prompt Cache lookup error:', dbErr.message);
+        console.warn('⚠️ MongoDB Prompt Cache lookup error:', dbErr.message);
       }
     }
 
-    // 3. Check L3 Qdrant Semantic Vector Similarity Cache (Paraphrased Queries: <25ms)
+    // 2. Check Qdrant Semantic Vector Similarity Cache (Paraphrased Queries: <25ms, Zero RAM)
     if (query && query.trim().length > 3) {
       try {
         const threshold = customThreshold || this.similarityThreshold;
@@ -192,20 +142,27 @@ class PromptCacheService {
 
             console.log(`🧠 [SEMANTIC CACHE HIT] (${similarityPct}% match) for: "${query}" => Matched: "${payload.question}"`);
 
-            // Promote to L1 Memory & L2 MongoDB under the new query's key
-            this.set(
-              effectiveKey,
-              {
-                answer: payload.answer,
-                confidence: payload.confidence || 'HIGH',
-                suggestedFollowUps: payload.suggestedFollowUps || [],
-                citedRules: payload.citedRules || []
-              },
-              { promptTokens: promptToks, completionTokens: complToks, totalTokens: totalToks, cachedTokens: tokensSaved },
-              null,
-              query,
-              model
-            );
+            // Persist to MongoDB under this new phrasing's exact key for subsequent queries
+            if (mongoose.connection.readyState === 1) {
+              PromptCache.findOneAndUpdate(
+                { key: effectiveKey },
+                {
+                  key: effectiveKey,
+                  normalizedQuery: normQ,
+                  model: model || 'openai/gpt-oss-120b',
+                  answer: payload.answer,
+                  confidence: payload.confidence || 'HIGH',
+                  suggestedFollowUps: payload.suggestedFollowUps || [],
+                  citedRules: payload.citedRules || [],
+                  promptTokens: promptToks,
+                  completionTokens: complToks,
+                  totalTokens: totalToks,
+                  cachedTokens: tokensSaved,
+                  $inc: { hitCount: 1 }
+                },
+                { upsert: true }
+              ).catch(() => {});
+            }
 
             this.stats.hits += 1;
             this.stats.semanticHits += 1;
@@ -236,7 +193,7 @@ class PromptCacheService {
       }
     }
 
-    // 4. Check L4 Retroactive QueryHistory in MongoDB (Fallback Pattern Match)
+    // 3. Check Retroactive QueryHistory in MongoDB (Fallback Pattern Match, Zero RAM)
     if (mongoose.connection.readyState === 1) {
       try {
         const words = normQ.split(/\s+/).filter((w) => w.length > 0);
@@ -256,7 +213,7 @@ class PromptCacheService {
           const totalToks = pastQuery.totalTokens || (promptToks + complToks) || 2293;
           const tokensSaved = pastQuery.cachedTokens || totalToks || 2293;
 
-          // Seed L1 & L2 & L3
+          // Seed MongoDB PromptCache & Qdrant Semantic Cache (Zero RAM storage)
           this.set(
             effectiveKey,
             {
@@ -292,7 +249,7 @@ class PromptCacheService {
           };
         }
       } catch (histErr) {
-        console.warn('⚠️ L4 QueryHistory cache lookup error:', histErr.message);
+        console.warn('⚠️ QueryHistory cache lookup error:', histErr.message);
       }
     }
 
@@ -301,7 +258,8 @@ class PromptCacheService {
   }
 
   /**
-   * Store prompt completion in L1 Memory, L2 MongoDB, and L3 Qdrant Semantic Cache
+   * Store prompt completion in MongoDB and Qdrant Semantic Vector Cache
+   * (Zero RAM memory used)
    */
   async set(key, data, tokens = {}, ttlMs = null, query = '', model = '') {
     if (!key || !data) return;
@@ -317,31 +275,15 @@ class PromptCacheService {
       return;
     }
 
-    // Enforce LRU capacity limit in RAM
-    if (this.cache.size >= this.maxEntries) {
-      const oldestKey = this.cache.keys().next().value;
-      if (oldestKey) this.cache.delete(oldestKey);
-    }
-
-    const now = Date.now();
-    const ttl = ttlMs || this.defaultTtlMs;
     const promptTokens = Number(tokens.promptTokens) || 0;
     const completionTokens = Number(tokens.completionTokens) || 0;
     const totalTokens = Number(tokens.totalTokens) || (promptTokens + completionTokens);
     const cachedTokens = Number(tokens.cachedTokens) || totalTokens || 2293;
     const normQ = this.normalizeQuery(query);
 
-    // 1. Save in L1 RAM
-    this.cache.set(key, {
-      data,
-      tokens: { promptTokens, completionTokens, totalTokens, cachedTokens },
-      createdAt: new Date().toISOString(),
-      expiresAt: now + ttl
-    });
-
     this.stats.cachedPromptsCreated += 1;
 
-    // 2. Save in L2 MongoDB Persistent Storage
+    // 1. Save in MongoDB Persistent Storage (0 RAM usage)
     if (mongoose.connection.readyState === 1) {
       try {
         await PromptCache.findOneAndUpdate(
@@ -367,7 +309,7 @@ class PromptCacheService {
       }
     }
 
-    // 3. Save into L3 Qdrant Semantic Vector Cache
+    // 2. Save into Qdrant Semantic Vector Cache (0 RAM usage)
     if (query && query.trim().length > 3) {
       try {
         const embeddingModel = getEmbeddingModel();
@@ -403,16 +345,16 @@ class PromptCacheService {
    * Invalidate cache entries
    */
   async invalidateAll() {
-    const count = this.cache.size;
-    this.cache.clear();
+    let count = 0;
     if (mongoose.connection.readyState === 1) {
       try {
-        await PromptCache.deleteMany({});
+        const res = await PromptCache.deleteMany({});
+        count = res?.deletedCount || 0;
       } catch (err) {
         console.warn('Could not clear MongoDB PromptCache:', err.message);
       }
     }
-    console.log(`🧹 Prompt Cache cleared (${count} entries invalidated).`);
+    console.log(`🧹 Prompt Cache cleared (${count} MongoDB entries deleted, 0 RAM used).`);
     return count;
   }
 
@@ -424,8 +366,8 @@ class PromptCacheService {
     const hitRate = totalRequests > 0 ? ((this.stats.hits / totalRequests) * 100).toFixed(1) : '0.0';
 
     return {
-      activeEntries: this.cache.size,
-      maxEntries: this.maxEntries,
+      activeEntries: 0, // Zero RAM usage
+      storage: 'MongoDB + Qdrant Vector Search',
       hits: this.stats.hits,
       misses: this.stats.misses,
       hitRate: `${hitRate}%`,

@@ -495,7 +495,7 @@ export const AdminDashboard = () => {
       </VStack>
 
       {/* Live Floating AI Compliance Widget for Admin Testing */}
-      <ComplianceWidget mode="floating" defaultOpen={false} />
+      {/* <ComplianceWidget mode="floating" defaultOpen={false} /> */}
     </Container>
   );
 };

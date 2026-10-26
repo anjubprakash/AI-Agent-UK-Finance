@@ -289,7 +289,7 @@ export const WidgetChat = () => {
               </Box>
             </Box>
           </Box>
-        </SimpleGrid>
+        </SimpleGrid>a
       </Box>
 
       {/* Floating React Widget Component in Bottom-Right Corner */}

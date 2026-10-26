@@ -15,13 +15,14 @@ import notificationRoutes from './routes/notification.routes.js';
 
 const app = express();
 
-// Security Middlewares (Configured to allow cross-origin iframe & script widget embedding)
+//Helmet security is being relaxed in specific areas so your chatbot/widget can work when embedded on another website
+
 app.use(
   helmet({
     contentSecurityPolicy: false,
     crossOriginEmbedderPolicy: false,
     crossOriginResourcePolicy: { policy: 'cross-origin' },
-    frameguard: false
+    frameguard: false//Allows your app to be loaded inside an <iframe>.
   })
 );
 app.use(
@@ -34,13 +35,13 @@ app.use(
 // Request Rate Limiting
 app.use('/api', apiRateLimiter);
 
-// Body Parsers
+// Body Parsers // size limit 
 app.use(express.json({ limit: '16mb' }));
 app.use(express.urlencoded({ extended: true, limit: '16mb' }));
 
 // Logging
 if (env.NODE_ENV !== 'test') {
-  app.use(morgan('dev'));
+  app.use(morgan('dev'));//Morgan helps you monitor and debug your API requests.
 }
 
 // Static uploads directory

@@ -1,5 +1,5 @@
 ﻿import { ApiError } from '../utils/apiError.js';
-import { ZodError } from 'zod';
+import { ZodError } from 'zod'; //Zod is a JavaScript/TypeScript library used to validate data.
 
 export const errorHandler = (err, req, res, next) => {
   let error = err;

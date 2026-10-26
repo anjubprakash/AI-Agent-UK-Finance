@@ -10,7 +10,7 @@ The platform enables compliance officers, risk analysts, MLROs, and financial st
 
 | Layer | Technology | Implementation Details |
 | :--- | :--- | :--- |
-| **Frontend Framework** | React 18 + Vite 5 | Pure JavaScript (`0% TypeScript`), running on `http://localhost:8080` with API proxy to `:5000` |
+| **Frontend Framework** | React 18 + Vite 5 | Pure JavaScript , running on `http://localhost:8080` with API proxy to `:5000` |
 | **UI Design System** | Chakra UI v2 | Custom UK Finance Sage & Slate Theme (`#52796F` Forest Sage, `#2F3E46` Slate Charcoal) with Light & Dark Mode |
 | **Backend Framework** | Node.js (v22+) + Express 5 | ES Modules (`"type": "module"`), REST API on `http://localhost:5000/api` |
 | **Primary Database** | MongoDB + Mongoose | Stores Users, Conversations, Query History, Regulatory Documents metadata, Prompt Cache, and Notifications |
@@ -149,6 +149,7 @@ Open **`http://localhost:8080`** in your browser.
 ## 6. REST API Endpoints Summary
 
 | Category | Method | Endpoint | Description |
+
 | :--- | :--- | :--- | :--- |
 | **Auth & Users** | `POST` | `/api/auth/login` | Authenticate user and receive JWT Bearer token |
 | **Auth & Users** | `POST` | `/api/auth/signup` | Register user account (first user auto-promoted to `ADMIN`) |

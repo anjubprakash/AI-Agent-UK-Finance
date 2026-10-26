@@ -177,7 +177,7 @@ export const processEmployeeQuery = async (question, user = {}, options = {}) =>
   const isFollowUpTurn = isConversationalFollowUp(question, conversationHistory);
   const contextualSearchQuery = buildContextualSearchQuery(question, conversationHistory);
 
-  // 2. Multi-Tier Prompt & Semantic Caching Check (RAM L1 + MongoDB L2 + Qdrant Semantic L3)
+  // 2. Cache Check: MongoDB Persistent Cache -> Qdrant Semantic Vector Search (Zero RAM storage)
   // If this is a pronoun follow-up turn (e.g. "What must they send to them if it is not resolved?"),
   // only use cache if the exact contextualized follow-up was already answered, never falsely matching Turn 1's broad question!
   const model = env.GROQ_MODEL;
@@ -200,7 +200,7 @@ export const processEmployeeQuery = async (question, user = {}, options = {}) =>
     const promptTokens = 0;
     const completionTokens = 0;
     const totalTokens = 0;
-    const durationMs = cacheType === 'SEMANTIC' ? 18 : 4; // Sub-20ms Qdrant vector hit or <5ms RAM/Mongo hit
+    const durationMs = cacheType === 'SEMANTIC' ? 18 : 5; // Sub-20ms Qdrant vector hit or <5ms MongoDB hit
     const costBreakdown = calculateTokenCost(model, 0, 0);
 
     console.log(`⚡ [${cacheType} CACHE HIT] 100% token savings (0 in / 0 out). Query: "${question}" ${semanticSimilarity ? `(${semanticSimilarity} match)` : ''}`);
